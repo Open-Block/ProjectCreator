@@ -1,0 +1,13 @@
+plugins {
+    id 'java-library'
+}
+
+version '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.intellij:annotations:+@jar'
+}
