@@ -1,37 +1,39 @@
 package org.openblock.creator.code.variable.parameter;
 
 import org.jetbrains.annotations.NotNull;
+import org.openblock.creator.code.call.ReturnType;
 import org.openblock.creator.code.variable.IVariable;
 
 public class Parameter implements IVariable {
 
-    private boolean isFinal;
-    private String name;
+    protected boolean isFinal;
+    protected @NotNull String name;
+    protected @NotNull ReturnType returnType;
 
-    public Parameter(@NotNull String name) {
-        this.setName(name);
+    public Parameter(@NotNull ReturnType type, @NotNull String name, boolean isFinal) {
+        isValidName(name);
+        this.isFinal = isFinal;
+        this.name = name;
+        this.returnType = type;
+    }
+
+    protected void isValidName(@NotNull String name) {
+        if (name.contains(" ") || name.contains("\t") || name.contains("\n")) {
+            throw new IllegalArgumentException("'" + name + "' cannot contain whitespace");
+        }
     }
 
     public boolean isFinal() {
         return this.isFinal;
     }
 
-    public Parameter setFinal(boolean isFinal) {
-        this.isFinal = isFinal;
-        return this;
-    }
-
     @Override
-    public String getName() {
+    public @NotNull String getName() {
         return this.name;
     }
 
     @Override
-    public Parameter setName(@NotNull String name) {
-        if (name.contains(" ") || name.contains("\t") || name.contains("\n")) {
-            throw new IllegalArgumentException("'" + name + "' cannot contain whitespace");
-        }
-        this.name = name;
-        return this;
+    public @NotNull ReturnType getReturnType() {
+        return this.returnType;
     }
 }

@@ -9,5 +9,5 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.intellij:annotations:+@jar'
+    implementation 'org.jetbrains:annotations:16.0.2'
 }

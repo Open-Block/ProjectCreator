@@ -4,7 +4,7 @@ import org.openblock.creator.code.Codeable;
 
 import java.util.List;
 
-public interface Statement {
+public interface Statement extends Codeable {
 
     List<Codeable> getCodeBlock();
 }

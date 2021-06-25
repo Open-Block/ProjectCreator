@@ -9,8 +9,4 @@ public interface IType extends Nameable {
 
     List<IClass> getClasses();
 
-    boolean isArray();
-
-    IType setArray(boolean array);
-
 }
