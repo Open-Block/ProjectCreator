@@ -1,16 +1,19 @@
 package org.openblock.creator.impl.java.clazz;
 
+import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.Visibility;
 import org.openblock.creator.code.clazz.ClassType;
 import org.openblock.creator.code.clazz.IClass;
 import org.openblock.creator.code.clazz.generic.IGeneric;
-import org.openblock.creator.code.clazz.generic.SpecifiedGenerics;
+import org.openblock.creator.code.clazz.generic.specified.NoGenerics;
+import org.openblock.creator.code.clazz.generic.specified.SpecifiedGenerics;
 import org.openblock.creator.code.function.IFunction;
-import org.openblock.creator.impl.java.clazz.generic.JavaClassSpecifiedGenerics;
+import org.openblock.creator.impl.java.clazz.generic.specified.JavaClassGenerics;
 import org.openblock.creator.impl.java.clazz.writer.JavaClassWriter;
 import org.openblock.creator.impl.java.function.method.JavaMethod;
 
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -21,6 +24,9 @@ public class JavaClass implements IClass {
     private final Class<?> clazz;
 
     public JavaClass(Class<?> clazz) {
+        if (clazz.isArray()) {
+            clazz = clazz.componentType();
+        }
         this.clazz = clazz;
     }
 
@@ -29,13 +35,17 @@ public class JavaClass implements IClass {
     }
 
     @Override
-    public String getName() {
+    public @NotNull String getName() {
         return this.clazz.getSimpleName();
     }
 
     @Override
     public String[] getPackage() {
-        return this.clazz.getPackage().getName().split(Pattern.quote("."));
+        Package packageValue = this.clazz.getPackage();
+        if (packageValue == null) {
+            return new String[0];
+        }
+        return packageValue.getName().split(Pattern.quote("."));
     }
 
     @Override
@@ -74,7 +84,11 @@ public class JavaClass implements IClass {
 
     @Override
     public List<IGeneric> getGenerics() {
-        return Collections.emptyList();
+        Type[] types = this.clazz.getGenericInterfaces();
+        if (types.length == 0) {
+            return Collections.emptyList();
+        }
+        return calcGenerics(this.clazz).stream().flatMap(s -> s.getGenerics().stream()).collect(Collectors.toList());
     }
 
     @Override
@@ -82,11 +96,18 @@ public class JavaClass implements IClass {
         return Optional.empty();
     }
 
+    private List<SpecifiedGenerics> calcGenerics(Class<?> start) {
+        if (start.getGenericInterfaces().length == 0) {
+            return Collections.singletonList(new NoGenerics(new JavaClass(start)));
+        }
+        return Collections.singletonList(new JavaClassGenerics(new JavaClass(start)));
+    }
+
     @Override
     public SortedSet<SpecifiedGenerics> getImplements() {
         return Stream
                 .of(this.clazz.getInterfaces())
-                .map(JavaClassSpecifiedGenerics::new)
+                .flatMap(i -> calcGenerics(i).stream())
                 .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(g -> (IClass) g.getTargetReference()))));
     }
 
@@ -100,14 +121,27 @@ public class JavaClass implements IClass {
         return Stream.of(this.clazz.getMethods()).map(JavaMethod::new).collect(Collectors.toSet());
     }
 
-    @Override
     public String writeCode() {
         return new JavaClassWriter().write(this);
     }
 
     @Override
+    @Deprecated
+    public String writeCode(int indent) {
+        return writeCode();
+    }
+
+    @Override
     public SortedSet<IClass> getImports() {
-        return Collections.emptySortedSet();
+        TreeSet<IClass> classes = new TreeSet<>();
+        classes.addAll(this.getFunctions().parallelStream().flatMap(f -> f.getImports().parallelStream()).collect(Collectors.toSet()));
+        classes.addAll(this.getImplements().parallelStream().filter(g -> g.getTargetReference() instanceof IClass).map(g -> (IClass) g.getTargetReference()).collect(Collectors.toSet()));
+        this.getExtendingClass().ifPresent(extending -> {
+            if (extending.getTargetReference() instanceof IClass) {
+                classes.add((IClass) extending.getTargetReference());
+            }
+        });
+        return classes;
     }
 
     @Override

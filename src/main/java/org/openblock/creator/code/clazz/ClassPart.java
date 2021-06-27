@@ -1,6 +1,8 @@
 package org.openblock.creator.code.clazz;
 
+import org.jetbrains.annotations.NotNull;
+
 public interface ClassPart {
 
-    IClass getTargetClass();
+    @NotNull IClass getTargetClass();
 }

@@ -10,4 +10,16 @@ public interface IGeneric extends Nameable, Codeable {
 
     List<IType> getClasses();
 
+    boolean isExtending();
+
+    String writeCode(boolean genericExtends);
+
+    default String writeCode() {
+        return writeCode(true);
+    }
+
+    @Override
+    default String writeCode(int indent) {
+        return writeCode();
+    }
 }

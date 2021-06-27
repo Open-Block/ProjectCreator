@@ -1,6 +1,7 @@
-package org.openblock.creator.code.clazz.generic;
+package org.openblock.creator.code.clazz.generic.specified;
 
 import org.openblock.creator.code.Nameable;
+import org.openblock.creator.code.clazz.generic.IGeneric;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,12 +14,11 @@ public interface SpecifiedGenerics {
 
     Nameable getTargetReference();
 
-    default String getDisplayName(){
+    default String getDisplayName() {
         StringBuilder builder = new StringBuilder(this.getTargetReference().getName());
-        List<IGeneric> generics = this.getGenerics();
         List<SpecifiedGenerics> specifiedGenerics = this.getSpecifiedGenericClass();
-        if(!generics.isEmpty() && !specifiedGenerics.isEmpty()) {
-            builder.append(" <");
+        if (!specifiedGenerics.isEmpty()) {
+            builder.append("<");
             builder.append(specifiedGenerics
                     .stream()
                     .map(SpecifiedGenerics::getDisplayName)

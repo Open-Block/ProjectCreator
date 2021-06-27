@@ -5,7 +5,7 @@ import org.openblock.creator.code.Codeable;
 import org.openblock.creator.code.Nameable;
 import org.openblock.creator.code.Visibility;
 import org.openblock.creator.code.clazz.generic.IGeneric;
-import org.openblock.creator.code.clazz.generic.SpecifiedGenerics;
+import org.openblock.creator.code.clazz.generic.specified.SpecifiedGenerics;
 import org.openblock.creator.code.function.IFunction;
 
 import java.util.List;

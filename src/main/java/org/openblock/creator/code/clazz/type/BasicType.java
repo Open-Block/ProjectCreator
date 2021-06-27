@@ -16,7 +16,7 @@ public class BasicType implements IType {
     }
 
     @Override
-    public String getName() {
+    public @NotNull String getName() {
         return this.clazz.getName();
     }
 

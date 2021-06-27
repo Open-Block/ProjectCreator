@@ -6,7 +6,7 @@ import java.util.SortedSet;
 
 public interface Codeable {
 
-    String writeCode();
+    String writeCode(int indent);
 
     SortedSet<IClass> getImports();
 }

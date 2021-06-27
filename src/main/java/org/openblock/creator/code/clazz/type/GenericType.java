@@ -1,5 +1,6 @@
 package org.openblock.creator.code.clazz.type;
 
+import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.clazz.IClass;
 import org.openblock.creator.code.clazz.generic.IGeneric;
 
@@ -15,7 +16,7 @@ public class GenericType implements IType {
     }
 
     @Override
-    public String getName() {
+    public @NotNull String getName() {
         return this.generic.getName();
     }
 
