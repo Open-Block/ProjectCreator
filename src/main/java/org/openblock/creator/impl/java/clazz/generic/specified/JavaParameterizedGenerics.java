@@ -32,7 +32,7 @@ public class JavaParameterizedGenerics implements SpecifiedGenerics {
     }
 
     @Override
-    public Nameable getTargetReference() {
+    public @NotNull Nameable getTargetReference() {
         return this.reference;
     }
 }

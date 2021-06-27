@@ -16,13 +16,13 @@ import java.util.stream.Collectors;
 
 public interface IClass extends Nameable, Codeable, Abstractable, Comparable<IClass> {
 
-    String[] getPackage();
+    @NotNull String[] getPackage();
 
     boolean isFinal();
 
-    ClassType getClassType();
+    @NotNull ClassType getClassType();
 
-    Visibility getVisibility();
+    @NotNull Visibility getVisibility();
 
     List<IGeneric> getGenerics();
 
@@ -34,7 +34,7 @@ public interface IClass extends Nameable, Codeable, Abstractable, Comparable<ICl
 
     Set<IFunction> getFunctions();
 
-    default String getFullName() {
+    default @NotNull String getFullName() {
         return String.join(".", this.getPackage()) + "." + this.getName();
     }
 

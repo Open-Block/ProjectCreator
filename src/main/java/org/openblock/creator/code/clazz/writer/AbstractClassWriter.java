@@ -39,7 +39,7 @@ public abstract class AbstractClassWriter<C extends IClass> implements ClassWrit
     //TODO - put this in standard method
     private String writeStandardMethodInit(IMethod function, int indent) {
         StringBuilder builder = new StringBuilder();
-        builder.append(" ".repeat(indent)).append(function.getVisibility().name().toLowerCase());
+        builder.append(" ".repeat(indent)).append(function.getVisibility().getDisplayName());
         builder.append(" ");
         if (function.isStatic()) {
             builder.append("static ");
@@ -78,7 +78,7 @@ public abstract class AbstractClassWriter<C extends IClass> implements ClassWrit
 
     private String writeInterfaceClassInit(C cClass) {
         StringBuilder builder = new StringBuilder();
-        builder.append(cClass.getVisibility().name().toLowerCase()).append(" ");
+        builder.append(cClass.getVisibility().getDisplayName()).append(" ");
         if (cClass.isFinal()) {
             builder.append("final ");
         }
@@ -95,7 +95,7 @@ public abstract class AbstractClassWriter<C extends IClass> implements ClassWrit
 
     private String writeStandardClassInit(C cClass) {
         StringBuilder builder = new StringBuilder();
-        builder.append(cClass.getVisibility().name().toLowerCase()).append(" ");
+        builder.append(cClass.getVisibility().getDisplayName()).append(" ");
         if (cClass.isAbstract()) {
             builder.append("abstract ");
         }

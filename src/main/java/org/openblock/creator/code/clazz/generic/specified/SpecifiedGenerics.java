@@ -1,5 +1,6 @@
 package org.openblock.creator.code.clazz.generic.specified;
 
+import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.Nameable;
 import org.openblock.creator.code.clazz.generic.IGeneric;
 
@@ -12,9 +13,9 @@ public interface SpecifiedGenerics {
 
     List<SpecifiedGenerics> getSpecifiedGenericClass();
 
-    Nameable getTargetReference();
+    @NotNull Nameable getTargetReference();
 
-    default String getDisplayName() {
+    default @NotNull String getDisplayName() {
         StringBuilder builder = new StringBuilder(this.getTargetReference().getName());
         List<SpecifiedGenerics> specifiedGenerics = this.getSpecifiedGenericClass();
         if (!specifiedGenerics.isEmpty()) {

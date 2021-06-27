@@ -38,10 +38,10 @@ public abstract class JavaFunction implements IFunction {
         this.method = method;
     }
 
-    public String writeCode(int indent) {
+    public @NotNull String writeCode(int indent) {
         StringBuilder builder = new StringBuilder();
         builder.append(" ".repeat(indent * 4));
-        builder.append(this.getVisibility().name().toLowerCase());
+        builder.append(this.getVisibility().getDisplayName());
         builder.append(" ");
         if (this instanceof JavaMethod m && m.isStatic()) {
             builder.append("static ");
@@ -69,7 +69,7 @@ public abstract class JavaFunction implements IFunction {
     }
 
     @Override
-    public SortedSet<IClass> getImports() {
+    public @NotNull SortedSet<IClass> getImports() {
         TreeSet<IClass> set = new TreeSet<>();
         set.addAll(this.getReturnType().getType().getClasses());
         set.addAll(this.getParameters().parallelStream().flatMap(p -> p.getReturnType().getType().getClasses().parallelStream()).collect(Collectors.toSet()));
@@ -82,7 +82,7 @@ public abstract class JavaFunction implements IFunction {
     }
 
     @Override
-    public Caller createCaller() {
+    public @NotNull Caller createCaller() {
         throw new RuntimeException("Not implemented");
     }
 

@@ -1,5 +1,6 @@
 package org.openblock.creator.impl.java.clazz.writer;
 
+import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.clazz.writer.AbstractClassWriter;
 import org.openblock.creator.code.clazz.writer.ClassWriter;
 import org.openblock.creator.impl.java.clazz.JavaClass;
@@ -8,7 +9,7 @@ import java.util.stream.Collectors;
 
 public class JavaClassWriter extends AbstractClassWriter<JavaClass> implements ClassWriter<JavaClass> {
     @Override
-    public String write(JavaClass clazz) {
+    public @NotNull String write(JavaClass clazz) {
         String imports = this.writeImports(clazz);
         if (imports.length() != 0) {
             imports = imports + "\n\n";

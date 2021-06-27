@@ -19,7 +19,7 @@ public class UnknownGeneric implements IGeneric {
     }
 
     @Override
-    public SortedSet<IClass> getImports() {
+    public @NotNull SortedSet<IClass> getImports() {
         return this.types.stream().flatMap(c -> c.getClasses().stream()).collect(Collectors.toCollection(TreeSet::new));
     }
 
@@ -39,7 +39,7 @@ public class UnknownGeneric implements IGeneric {
     }
 
     @Override
-    public String writeCode(boolean genericExtends) {
+    public @NotNull String writeCode(boolean genericExtends) {
         if (this.types.isEmpty() || !genericExtends) {
             return "?";
         }

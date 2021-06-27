@@ -20,7 +20,7 @@ public class CollectedGeneric implements IGeneric {
         this.classes.addAll(type);
     }
 
-    public String writeCode(boolean code) {
+    public @NotNull String writeCode(boolean code) {
         if (!this.name.equals("?") && !code) {
             return this.name;
         }
@@ -28,7 +28,7 @@ public class CollectedGeneric implements IGeneric {
     }
 
     @Override
-    public SortedSet<IClass> getImports() {
+    public @NotNull SortedSet<IClass> getImports() {
         return this.classes.parallelStream().flatMap(i -> i.getClasses().parallelStream()).collect(Collectors.toCollection(TreeSet::new));
     }
 

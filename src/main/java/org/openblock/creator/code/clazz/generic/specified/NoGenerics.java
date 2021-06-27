@@ -1,5 +1,6 @@
 package org.openblock.creator.code.clazz.generic.specified;
 
+import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.Nameable;
 import org.openblock.creator.code.clazz.generic.IGeneric;
 
@@ -25,7 +26,7 @@ public class NoGenerics implements SpecifiedGenerics {
     }
 
     @Override
-    public Nameable getTargetReference() {
+    public @NotNull Nameable getTargetReference() {
         return this.reference;
     }
 }

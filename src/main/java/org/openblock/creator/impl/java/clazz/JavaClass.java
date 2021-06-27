@@ -54,7 +54,7 @@ public class JavaClass implements IClass {
     }
 
     @Override
-    public ClassType getClassType() {
+    public @NotNull ClassType getClassType() {
         if (this.clazz.isEnum()) {
             return ClassType.ENUM;
         }
@@ -68,7 +68,7 @@ public class JavaClass implements IClass {
     }
 
     @Override
-    public Visibility getVisibility() {
+    public @NotNull Visibility getVisibility() {
         int modifier = this.clazz.getModifiers();
         if (Modifier.isPublic(modifier)) {
             return Visibility.PUBLIC;
@@ -127,12 +127,12 @@ public class JavaClass implements IClass {
 
     @Override
     @Deprecated
-    public String writeCode(int indent) {
+    public @NotNull String writeCode(int indent) {
         return writeCode();
     }
 
     @Override
-    public SortedSet<IClass> getImports() {
+    public @NotNull SortedSet<IClass> getImports() {
         TreeSet<IClass> classes = new TreeSet<>();
         classes.addAll(this.getFunctions().parallelStream().flatMap(f -> f.getImports().parallelStream()).collect(Collectors.toSet()));
         classes.addAll(this.getImplements().parallelStream().filter(g -> g.getTargetReference() instanceof IClass).map(g -> (IClass) g.getTargetReference()).collect(Collectors.toSet()));

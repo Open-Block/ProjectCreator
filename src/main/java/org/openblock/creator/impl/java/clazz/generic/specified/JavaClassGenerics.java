@@ -1,5 +1,6 @@
 package org.openblock.creator.impl.java.clazz.generic.specified;
 
+import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.clazz.generic.IGeneric;
 import org.openblock.creator.code.clazz.generic.specified.SpecifiedGenerics;
 import org.openblock.creator.impl.java.clazz.JavaClass;
@@ -30,12 +31,12 @@ public class JavaClassGenerics implements SpecifiedGenerics {
     }
 
     @Override
-    public JavaClass getTargetReference() {
+    public @NotNull JavaClass getTargetReference() {
         return this.clazz;
     }
 
     @Override
-    public String getDisplayName() {
+    public @NotNull String getDisplayName() {
         return this
                 .clazz
                 .getName()

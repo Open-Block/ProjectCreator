@@ -1,5 +1,6 @@
 package org.openblock.creator.impl.java.clazz.generic.specified;
 
+import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.Nameable;
 import org.openblock.creator.code.clazz.generic.IGeneric;
 import org.openblock.creator.code.clazz.generic.specified.SpecifiedGenerics;
@@ -31,12 +32,12 @@ public class JavaWildcardGenerics implements SpecifiedGenerics {
     }
 
     @Override
-    public Nameable getTargetReference() {
+    public @NotNull Nameable getTargetReference() {
         return this.reference;
     }
 
     @Override
-    public String getDisplayName() {
+    public @NotNull String getDisplayName() {
         return this.getGenerics().stream().map(g -> g.writeCode(false)).collect(Collectors.joining(", "));
         //return this.type.getName() + " extends " + this.getGenerics().get(0).getClasses().stream().flatMap(type -> type.getClasses().stream()).map(t -> t.getName()).collect(Collectors.joining("&"));
     }
