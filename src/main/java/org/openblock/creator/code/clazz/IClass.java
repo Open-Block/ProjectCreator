@@ -7,11 +7,9 @@ import org.openblock.creator.code.Visibility;
 import org.openblock.creator.code.clazz.generic.IGeneric;
 import org.openblock.creator.code.clazz.generic.specified.SpecifiedGenerics;
 import org.openblock.creator.code.function.IFunction;
+import org.openblock.creator.code.variable.field.Field;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.SortedSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public interface IClass extends Nameable, Codeable, Abstractable, Comparable<IClass> {
@@ -25,6 +23,8 @@ public interface IClass extends Nameable, Codeable, Abstractable, Comparable<ICl
     @NotNull Visibility getVisibility();
 
     List<IGeneric> getGenerics();
+
+    List<Field> getFields();
 
     Optional<SpecifiedGenerics> getExtendingClass();
 
@@ -45,5 +45,19 @@ public interface IClass extends Nameable, Codeable, Abstractable, Comparable<ICl
     @Override
     default int compareTo(@NotNull IClass o) {
         return this.getFullName().compareTo(o.getFullName());
+    }
+
+    @Override
+    default @NotNull SortedSet<IClass> getImports(){
+        TreeSet<IClass> classes = new TreeSet<>();
+        classes.addAll(this.getFields().parallelStream().flatMap(f -> f.getReturnType().getType().getClasses().parallelStream()).collect(Collectors.toList()));
+        classes.addAll(this.getFunctions().parallelStream().flatMap(f -> f.getImports().parallelStream()).collect(Collectors.toSet()));
+        classes.addAll(this.getImplements().parallelStream().filter(g -> g.getTargetReference() instanceof IClass).map(g -> (IClass) g.getTargetReference()).collect(Collectors.toSet()));
+        this.getExtendingClass().ifPresent(extending -> {
+            if (extending.getTargetReference() instanceof IClass) {
+                classes.add((IClass) extending.getTargetReference());
+            }
+        });
+        return classes;
     }
 }

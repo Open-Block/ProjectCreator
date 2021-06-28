@@ -2,11 +2,9 @@ package clazz.writing;
 
 import org.openblock.creator.impl.java.clazz.JavaClass;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.File;
 
-public class JavaFileWriter {
+public class TestJavaFileWriter {
 
     public void testIsWrittenCorrectly(Class<?> clazz) {
         JavaClass javaClass = new JavaClass(clazz);
@@ -18,11 +16,9 @@ public class JavaFileWriter {
     }
 
     public static void main(String[] args) {
-        JavaFileWriter writer = new JavaFileWriter();
-        List<Integer> clazz = new ArrayList<>();
-        clazz.add(1);
+        TestJavaFileWriter writer = new TestJavaFileWriter();
         //writer.testIsWrittenCorrectly(File.class);
         //writer.testIsWrittenCorrectly(Path.class);
-        writer.testIsWrittenCorrectly(clazz.getClass());
+        writer.testIsWrittenCorrectly(File.class);
     }
 }

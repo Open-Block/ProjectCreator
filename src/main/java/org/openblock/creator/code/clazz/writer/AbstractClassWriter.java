@@ -3,7 +3,9 @@ package org.openblock.creator.code.clazz.writer;
 import org.openblock.creator.code.clazz.IClass;
 import org.openblock.creator.code.clazz.generic.IGeneric;
 import org.openblock.creator.code.clazz.generic.specified.SpecifiedGenerics;
+import org.openblock.creator.code.function.IConstructor;
 import org.openblock.creator.code.function.IMethod;
+import org.openblock.creator.code.variable.field.Field;
 
 import java.util.List;
 import java.util.TreeSet;
@@ -33,6 +35,18 @@ public abstract class AbstractClassWriter<C extends IClass> implements ClassWrit
                 .map(c -> "import " + String.join(".", c.getPackage()) + "." + c.getName() + ";")
                 .collect(Collectors.toCollection(TreeSet::new));
         return String.join("\n", imports);
+    }
+
+    public String writeField(Field field) {
+        String fin = "";
+        String sta = "";
+        if (field.isFinal()) {
+            fin = "final ";
+        }
+        if (field.isStatic()) {
+            sta = "static ";
+        }
+        return field.getVisibility().getDisplayName() + " " + sta + fin + field.getReturnType().getDisplayText() + " " + field.getName();
     }
 
 

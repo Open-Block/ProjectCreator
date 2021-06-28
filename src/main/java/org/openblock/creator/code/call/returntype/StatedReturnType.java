@@ -1,29 +1,27 @@
-package org.openblock.creator.code.call;
+package org.openblock.creator.code.call.returntype;
 
 import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.clazz.type.IType;
 
-public class ReturnType {
+public class StatedReturnType implements ReturnType {
 
     private final @NotNull
     IType type;
     private final boolean isArray;
 
-    public ReturnType(@NotNull IType type, boolean isArray) {
+    public StatedReturnType(@NotNull IType type, boolean isArray) {
         this.type = type;
         this.isArray = isArray;
     }
 
+    @Override
     public @NotNull
     IType getType() {
         return type;
     }
 
+    @Override
     public boolean isArray() {
         return isArray;
-    }
-
-    public String getDisplayText(){
-        return this.getType().getName() + (this.isArray ? "[]" : "");
     }
 }

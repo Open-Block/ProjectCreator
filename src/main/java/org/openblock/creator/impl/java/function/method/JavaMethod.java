@@ -1,9 +1,8 @@
 package org.openblock.creator.impl.java.function.method;
 
 import org.jetbrains.annotations.NotNull;
-import org.openblock.creator.code.call.ReturnType;
+import org.openblock.creator.code.call.returntype.StatedReturnType;
 import org.openblock.creator.code.clazz.generic.specified.SpecifiedGenerics;
-import org.openblock.creator.code.clazz.type.BasicType;
 import org.openblock.creator.code.clazz.type.SpecifiedGenericType;
 import org.openblock.creator.code.function.IMethod;
 import org.openblock.creator.impl.java.clazz.JavaClass;
@@ -26,11 +25,11 @@ public class JavaMethod extends JavaFunction implements IMethod {
     }
 
     @Override
-    public @NotNull ReturnType getReturnType() {
+    public @NotNull StatedReturnType getReturnType() {
         Method method = ((Method)this.method);
         Type returnType = method.getGenericReturnType();
         Class<?> returnClassType = method.getReturnType();
         SpecifiedGenerics generics = JavaGenerics.specified(new JavaClass(returnClassType), returnType);
-        return new ReturnType(new SpecifiedGenericType(generics), returnClassType.isArray());
+        return new StatedReturnType(new SpecifiedGenericType(generics), returnClassType.isArray());
     }
 }

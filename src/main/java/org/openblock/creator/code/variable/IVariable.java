@@ -5,4 +5,6 @@ import org.openblock.creator.code.call.Returnable;
 
 public interface IVariable extends Nameable, Returnable {
 
+    boolean isFinal();
+
 }

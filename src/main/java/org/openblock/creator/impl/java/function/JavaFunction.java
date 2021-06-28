@@ -4,14 +4,11 @@ import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.Codeable;
 import org.openblock.creator.code.Visibility;
 import org.openblock.creator.code.call.Caller;
-import org.openblock.creator.code.call.ReturnType;
+import org.openblock.creator.code.call.returntype.StatedReturnType;
+import org.openblock.creator.code.clazz.ClassType;
 import org.openblock.creator.code.clazz.IClass;
-import org.openblock.creator.code.clazz.generic.CollectedGeneric;
 import org.openblock.creator.code.clazz.generic.IGeneric;
 import org.openblock.creator.code.clazz.generic.specified.SpecifiedGenerics;
-import org.openblock.creator.code.clazz.type.BasicType;
-import org.openblock.creator.code.clazz.type.GenericType;
-import org.openblock.creator.code.clazz.type.IType;
 import org.openblock.creator.code.clazz.type.SpecifiedGenericType;
 import org.openblock.creator.code.function.IFunction;
 import org.openblock.creator.code.variable.parameter.Parameter;
@@ -20,7 +17,6 @@ import org.openblock.creator.impl.java.clazz.generic.JavaGenerics;
 import org.openblock.creator.impl.java.function.method.JavaMethod;
 
 import java.lang.reflect.Executable;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.Collections;
@@ -34,11 +30,11 @@ public abstract class JavaFunction implements IFunction {
 
     protected final Executable method;
 
-    public JavaFunction(Method method) {
+    public JavaFunction(Executable method) {
         this.method = method;
     }
 
-    public @NotNull String writeCode(int indent) {
+    public @NotNull String writeCode(int indent, ClassType type) {
         StringBuilder builder = new StringBuilder();
         builder.append(" ".repeat(indent * 4));
         builder.append(this.getVisibility().getDisplayName());
@@ -52,8 +48,10 @@ public abstract class JavaFunction implements IFunction {
             builder.append(generics);
             builder.append("> ");
         }
-        builder.append(this.getReturnType().getDisplayText());
-        builder.append(" ");
+        if (this instanceof JavaMethod) {
+            builder.append(this.getReturnType().getDisplayText());
+            builder.append(" ");
+        }
         builder.append(this.getName());
         builder.append("(");
         builder.append(this
@@ -98,7 +96,7 @@ public abstract class JavaFunction implements IFunction {
             Class<?> clazz = p.getType();
             SpecifiedGenerics generics = JavaGenerics.specified(new JavaClass(clazz), parameterType);
             SpecifiedGenericType type = new SpecifiedGenericType(generics);
-            return new Parameter(new ReturnType(type, clazz.isArray()), p.getName(), Modifier.isFinal(p.getModifiers()));
+            return new Parameter(new StatedReturnType(type, clazz.isArray()), p.getName(), Modifier.isFinal(p.getModifiers()));
         }).collect(Collectors.toList());
     }
 

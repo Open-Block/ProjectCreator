@@ -2,11 +2,11 @@ package org.openblock.creator.code.variable.parameter;
 
 import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.Writable;
-import org.openblock.creator.code.call.ReturnType;
+import org.openblock.creator.code.call.returntype.StatedReturnType;
 
 public class WritableParameter extends Parameter implements Writable {
 
-    public WritableParameter(ReturnType type, String name, boolean isFinal) {
+    public WritableParameter(StatedReturnType type, String name, boolean isFinal) {
         super(type, name, isFinal);
     }
 
@@ -15,7 +15,7 @@ public class WritableParameter extends Parameter implements Writable {
         return this;
     }
 
-    public WritableParameter setReturnType(ReturnType type) {
+    public WritableParameter setReturnType(StatedReturnType type) {
         this.returnType = type;
         return this;
     }

@@ -1,16 +1,16 @@
 package org.openblock.creator.code.variable.parameter;
 
 import org.jetbrains.annotations.NotNull;
-import org.openblock.creator.code.call.ReturnType;
+import org.openblock.creator.code.call.returntype.StatedReturnType;
 import org.openblock.creator.code.variable.IVariable;
 
 public class Parameter implements IVariable {
 
     protected boolean isFinal;
     protected @NotNull String name;
-    protected @NotNull ReturnType returnType;
+    protected @NotNull StatedReturnType returnType;
 
-    public Parameter(@NotNull ReturnType type, @NotNull String name, boolean isFinal) {
+    public Parameter(@NotNull StatedReturnType type, @NotNull String name, boolean isFinal) {
         isValidName(name);
         this.isFinal = isFinal;
         this.name = name;
@@ -23,6 +23,7 @@ public class Parameter implements IVariable {
         }
     }
 
+    @Override
     public boolean isFinal() {
         return this.isFinal;
     }
@@ -33,7 +34,7 @@ public class Parameter implements IVariable {
     }
 
     @Override
-    public @NotNull ReturnType getReturnType() {
+    public @NotNull StatedReturnType getReturnType() {
         return this.returnType;
     }
 }

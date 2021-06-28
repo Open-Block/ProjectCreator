@@ -2,14 +2,20 @@ package org.openblock.creator.impl.java.clazz;
 
 import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.Visibility;
+import org.openblock.creator.code.call.returntype.StatedReturnType;
 import org.openblock.creator.code.clazz.ClassType;
 import org.openblock.creator.code.clazz.IClass;
 import org.openblock.creator.code.clazz.generic.IGeneric;
 import org.openblock.creator.code.clazz.generic.specified.NoGenerics;
 import org.openblock.creator.code.clazz.generic.specified.SpecifiedGenerics;
+import org.openblock.creator.code.clazz.type.SpecifiedGenericType;
 import org.openblock.creator.code.function.IFunction;
+import org.openblock.creator.code.variable.field.Field;
+import org.openblock.creator.code.variable.field.UninitiatedField;
+import org.openblock.creator.impl.java.clazz.generic.JavaGenerics;
 import org.openblock.creator.impl.java.clazz.generic.specified.JavaClassGenerics;
 import org.openblock.creator.impl.java.clazz.writer.JavaClassWriter;
+import org.openblock.creator.impl.java.function.constructor.JavaConstructor;
 import org.openblock.creator.impl.java.function.method.JavaMethod;
 
 import java.lang.reflect.Modifier;
@@ -18,6 +24,9 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+//TODO functions
+
 
 public class JavaClass implements IClass {
 
@@ -92,6 +101,32 @@ public class JavaClass implements IClass {
     }
 
     @Override
+    public List<Field> getFields() {
+        return Stream.of(this.clazz.getFields()).map(f -> {
+            Visibility visibility = Visibility.PACKAGED;
+            if (Modifier.isPrivate(f.getModifiers())) {
+                visibility = Visibility.PRIVATE;
+            }
+            if (Modifier.isProtected(f.getModifiers())) {
+                visibility = Visibility.PROTECTED;
+            }
+            if (Modifier.isPublic(f.getModifiers())) {
+                visibility = Visibility.PUBLIC;
+            }
+
+            return new UninitiatedField(
+                    visibility,
+                    new StatedReturnType(
+                            new SpecifiedGenericType(
+                                    JavaGenerics.specified(this, f.getGenericType())),
+                            f.getType().isArray()),
+                    f.getName(),
+                    Modifier.isFinal(f.getModifiers()),
+                    Modifier.isStatic(f.getModifiers()));
+        }).collect(Collectors.toList());
+    }
+
+    @Override
     public Optional<SpecifiedGenerics> getExtendingClass() {
         return Optional.empty();
     }
@@ -118,7 +153,9 @@ public class JavaClass implements IClass {
 
     @Override
     public Set<IFunction> getFunctions() {
-        return Stream.of(this.clazz.getMethods()).map(JavaMethod::new).collect(Collectors.toSet());
+        Set<IFunction> functions = Stream.of(this.clazz.getMethods()).map(JavaMethod::new).collect(Collectors.toSet());
+        functions.addAll(Stream.of(this.clazz.getConstructors()).map(c -> new JavaConstructor(c)).collect(Collectors.toSet()));
+        return functions;
     }
 
     public String writeCode() {
@@ -129,19 +166,6 @@ public class JavaClass implements IClass {
     @Deprecated
     public @NotNull String writeCode(int indent) {
         return writeCode();
-    }
-
-    @Override
-    public @NotNull SortedSet<IClass> getImports() {
-        TreeSet<IClass> classes = new TreeSet<>();
-        classes.addAll(this.getFunctions().parallelStream().flatMap(f -> f.getImports().parallelStream()).collect(Collectors.toSet()));
-        classes.addAll(this.getImplements().parallelStream().filter(g -> g.getTargetReference() instanceof IClass).map(g -> (IClass) g.getTargetReference()).collect(Collectors.toSet()));
-        this.getExtendingClass().ifPresent(extending -> {
-            if (extending.getTargetReference() instanceof IClass) {
-                classes.add((IClass) extending.getTargetReference());
-            }
-        });
-        return classes;
     }
 
     @Override
