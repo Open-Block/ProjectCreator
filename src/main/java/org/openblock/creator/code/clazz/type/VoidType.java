@@ -6,10 +6,10 @@ import org.openblock.creator.code.clazz.IClass;
 import java.util.Collections;
 import java.util.List;
 
-public class VoidType implements IType{
+public class VoidType implements IType {
     @Override
     public @NotNull String getName() {
-        return "Void";
+        return "void";
     }
 
     @Override

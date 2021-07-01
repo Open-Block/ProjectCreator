@@ -16,6 +16,15 @@ public class InitiatedField extends Field {
     }
 
     @Override
+    public @NotNull String writeCode(int indent) {
+        return super.writeCode(indent) + " = " + caller.writeCode(0);
+    }
+
+    public Caller getCode() {
+        return this.caller;
+    }
+
+    @Override
     public @NotNull ReturnType getReturnType() {
         @NotNull ReturnType returnType = this.caller.getCallable().getReturnType();
         if (returnType instanceof VoidedReturnType) {

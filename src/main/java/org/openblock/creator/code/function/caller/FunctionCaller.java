@@ -1,9 +1,11 @@
-package org.openblock.creator.impl.custom.function.constructor;
+package org.openblock.creator.code.function.caller;
 
 import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.Codeable;
 import org.openblock.creator.code.call.Caller;
 import org.openblock.creator.code.clazz.IClass;
+import org.openblock.creator.code.function.IConstructor;
+import org.openblock.creator.code.function.IFunction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,35 +13,30 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-public class ConstructorCaller implements Caller.Parameter {
+public abstract class FunctionCaller<F extends IFunction> implements Caller.Parameter {
 
-    private final CustomConstructor constructor;
-    private final List<Codeable> parameters = new ArrayList<>();
+    protected final F function;
+    protected final List<Codeable> parameters = new ArrayList<>();
 
-    public ConstructorCaller(CustomConstructor constructor) {
-        this.constructor = constructor;
+    public FunctionCaller(F function) {
+        this.function = function;
     }
 
     @Override
-    public @NotNull String writeCode(int indent) {
-        return "new " + this.constructor.getTargetClass().getName() + "(" + this.parameters.stream().map(p -> p.writeCode(0)).collect(Collectors.joining(", ")) + ")";
+    public F getCallable() {
+        return this.function;
     }
 
     @Override
     public @NotNull SortedSet<IClass> getImports() {
         SortedSet<IClass> set = new TreeSet<>();
-        set.add(this.constructor.getTargetClass());
+        set.add(this.getCallable().getTargetClass());
         set.addAll(this
                 .getParameters()
                 .parallelStream()
                 .flatMap(c -> c.getImports().parallelStream())
                 .collect(Collectors.toSet()));
         return set;
-    }
-
-    @Override
-    public CustomConstructor getCallable() {
-        return this.constructor;
     }
 
     @Override

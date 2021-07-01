@@ -1,32 +1,36 @@
-package org.openblock.creator.impl.custom.clazz.interfacetype;
+package org.openblock.creator.impl.custom.clazz.standardtype;
 
 import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.clazz.ClassType;
 import org.openblock.creator.code.clazz.generic.specified.SpecifiedGenerics;
 import org.openblock.creator.impl.custom.clazz.AbstractCustomClass;
 import org.openblock.creator.impl.custom.clazz.CustomClassBuilder;
-import org.openblock.creator.impl.custom.clazz.CustomClassWriter;
 
 import java.util.Optional;
 
-public class CustomInterface extends AbstractCustomClass {
+public class CustomStandardClass extends AbstractCustomClass {
 
-    public CustomInterface(CustomClassBuilder builder) {
+    private final boolean isAbstract;
+    private final SpecifiedGenerics extending;
+
+    public CustomStandardClass(CustomClassBuilder builder) {
         super(builder);
+        this.isAbstract = builder.isAbstract();
+        this.extending = builder.getExtending();
     }
 
     @Override
     public boolean isAbstract() {
-        return true;
+        return this.isAbstract;
     }
 
     @Override
     public @NotNull ClassType getClassType() {
-        return ClassType.INTERFACE;
+        return ClassType.STANDARD;
     }
 
     @Override
     public Optional<SpecifiedGenerics> getExtendingClass() {
-        return Optional.empty();
+        return Optional.ofNullable(this.extending);
     }
 }

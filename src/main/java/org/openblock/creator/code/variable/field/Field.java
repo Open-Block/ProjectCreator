@@ -2,7 +2,13 @@ package org.openblock.creator.code.variable.field;
 
 import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.Visibility;
+import org.openblock.creator.code.clazz.IClass;
+import org.openblock.creator.code.clazz.type.BasicType;
+import org.openblock.creator.code.clazz.type.IType;
 import org.openblock.creator.code.variable.IVariable;
+
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public abstract class Field implements IVariable {
 
@@ -24,6 +30,33 @@ public abstract class Field implements IVariable {
 
     public boolean isStatic(){
         return this.isStatic;
+    }
+
+    @Override
+    public @NotNull String writeCode(int indent) {
+        String ret = " ".repeat(indent * 4) + this.getVisibility().getDisplayName() + " ";
+        if(this.isStatic()){
+            ret = ret + "static ";
+        }
+        if(this.isFinal()){
+            ret = ret + "final ";
+        }
+        ret = ret + this.getReturnType().getDisplayText() + " ";
+        ret = ret + this.getName();
+        return ret;
+    }
+
+    @Override
+    public @NotNull SortedSet<IClass> getImports() {
+        SortedSet<IClass> classes = new TreeSet<>();
+        IType type = this.getReturnType().getType();
+        if(type instanceof BasicType b){
+            classes.add(b.getTargetClass());
+        }
+        if(this instanceof InitiatedField f){
+            classes.addAll(f.getCode().getImports());
+        }
+        return classes;
     }
 
     @Override

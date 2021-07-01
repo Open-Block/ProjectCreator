@@ -2,10 +2,16 @@ package org.openblock.creator.code.function;
 
 import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.clazz.ClassType;
+import org.openblock.creator.code.function.caller.ConstructorCaller;
 
 import java.util.stream.Collectors;
 
 public interface IConstructor extends IFunction {
+
+    @Override
+    default @NotNull ConstructorCaller createCaller() {
+        return new ConstructorCaller(this);
+    }
 
     @Override
     default @NotNull String writeCode(int indent, ClassType type) {

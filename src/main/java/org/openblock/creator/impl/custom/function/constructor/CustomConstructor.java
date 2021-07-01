@@ -15,11 +15,6 @@ public class CustomConstructor extends AbstractCustomFunction implements IConstr
     }
 
     @Override
-    public @NotNull ConstructorCaller createCaller() {
-        return new ConstructorCaller(this);
-    }
-
-    @Override
     public @NotNull StatedReturnType getReturnType() {
         return new StatedReturnType(new BasicType(this.getTargetClass()), false);
     }

@@ -15,12 +15,17 @@ public class BasicType implements IType {
         this.clazz = clazz;
     }
 
+    public IClass getTargetClass() {
+        return this.clazz;
+    }
+
     @Override
     public @NotNull String getName() {
         return this.clazz.getName();
     }
 
     @Override
+    @Deprecated
     public List<IClass> getClasses() {
         return Collections.singletonList(this.clazz);
     }

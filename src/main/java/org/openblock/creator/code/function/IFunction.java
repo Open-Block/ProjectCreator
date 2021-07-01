@@ -7,6 +7,7 @@ import org.openblock.creator.code.call.Callable;
 import org.openblock.creator.code.clazz.ClassPart;
 import org.openblock.creator.code.clazz.ClassType;
 import org.openblock.creator.code.clazz.generic.IGeneric;
+import org.openblock.creator.code.function.caller.FunctionCaller;
 import org.openblock.creator.code.statement.Statement;
 import org.openblock.creator.code.variable.parameter.Parameter;
 
@@ -20,6 +21,9 @@ public interface IFunction extends Nameable, Statement, Callable, ClassPart, Com
     @NotNull Visibility getVisibility();
 
     List<IGeneric> getGenerics();
+
+    @Override
+    @NotNull FunctionCaller<?> createCaller();
 
     String writeCode(int indent, ClassType type);
 

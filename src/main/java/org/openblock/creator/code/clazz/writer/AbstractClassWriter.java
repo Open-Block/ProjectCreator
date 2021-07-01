@@ -49,39 +49,6 @@ public abstract class AbstractClassWriter<C extends IClass> implements ClassWrit
         return field.getVisibility().getDisplayName() + " " + sta + fin + field.getReturnType().getDisplayText() + " " + field.getName();
     }
 
-
-    //TODO - put this in standard method
-    private String writeStandardMethodInit(IMethod function, int indent) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(" ".repeat(indent)).append(function.getVisibility().getDisplayName());
-        builder.append(" ");
-        if (function.isStatic()) {
-            builder.append("static ");
-        }
-        if (!function.getGenerics().isEmpty()) {
-            String generics = function.getGenerics().stream().map(g -> g.writeCode(0)).collect(Collectors.joining(", "));
-            builder.append("<");
-            builder.append(generics);
-            builder.append("> ");
-        }
-        builder.append(function.getReturnType().getDisplayText());
-        builder.append(" ");
-        builder.append(function.getName());
-        builder.append(" (");
-        builder.append(function
-                .getParameters()
-                .stream()
-                .map(p -> (p.isFinal() ? "final " : "")
-                        + p.getReturnType().getDisplayText()
-                        + " " + p.getName()
-                )
-                .collect(Collectors.joining(", ")));
-        builder.append(") {\n");
-        function.getCodeBlock().forEach(c -> builder.append("\n").append(" ".repeat(indent)).append(c.writeCode(0)));
-        builder.append(" ".repeat(indent)).append("}");
-        return builder.toString();
-    }
-
     protected String writeClassInit(C cClass) {
         return switch (cClass.getClassType()) {
             case STANDARD -> writeStandardClassInit(cClass);

@@ -10,14 +10,13 @@ import org.openblock.creator.code.variable.parameter.Parameter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 public abstract class AbstractCustomFunction implements IFunction {
 
     protected @NotNull String name;
     protected @NotNull Visibility visibility;
     protected @NotNull IClass clazz;
+    protected boolean isAbstract;
     protected List<Parameter> parameters = new ArrayList<>();
     protected List<IGeneric> generics = new ArrayList<>();
     protected List<Codeable> codeBlock = new ArrayList<>();
@@ -29,14 +28,6 @@ public abstract class AbstractCustomFunction implements IFunction {
         this.parameters.addAll(builder.getParameters());
         this.generics.addAll(builder.getGenerics());
         this.codeBlock.addAll(builder.getCodeBlock());
-
-    }
-
-    @Override
-    public @NotNull SortedSet<IClass> getImports() {
-        SortedSet<IClass> set = new TreeSet<>();
-
-        return set;
     }
 
     @Override

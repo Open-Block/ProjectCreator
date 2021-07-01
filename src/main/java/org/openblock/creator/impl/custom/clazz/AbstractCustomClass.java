@@ -36,6 +36,11 @@ public abstract class AbstractCustomClass implements IClass {
     }
 
     @Override
+    public @NotNull String writeCode(int indent) {
+        return new CustomClassWriter<>().write(this);
+    }
+
+    @Override
     public @NotNull String getName() {
         return this.name;
     }

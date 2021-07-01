@@ -3,7 +3,6 @@ package org.openblock.creator.impl.java.function;
 import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.Codeable;
 import org.openblock.creator.code.Visibility;
-import org.openblock.creator.code.call.Caller;
 import org.openblock.creator.code.call.returntype.StatedReturnType;
 import org.openblock.creator.code.clazz.ClassType;
 import org.openblock.creator.code.clazz.IClass;
@@ -77,11 +76,6 @@ public abstract class JavaFunction implements IFunction {
     @Override
     public @NotNull String getName() {
         return this.method.getName();
-    }
-
-    @Override
-    public @NotNull Caller createCaller() {
-        throw new RuntimeException("Not implemented");
     }
 
     @Override
