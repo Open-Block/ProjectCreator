@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.call.Returnable;
 import org.openblock.creator.code.call.returntype.ReturnType;
 import org.openblock.creator.code.clazz.IClass;
-import utils.OpenStringUtils;
+import org.openblock.creator.utils.OpenStringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;

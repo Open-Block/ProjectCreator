@@ -2,9 +2,8 @@ package org.openblock.creator.code.variable;
 
 import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.call.Caller;
-import org.openblock.creator.code.call.returntype.ReturnType;
 import org.openblock.creator.code.clazz.IClass;
-import utils.OpenStringUtils;
+import org.openblock.creator.utils.OpenStringUtils;
 
 import java.util.SortedSet;
 import java.util.TreeSet;

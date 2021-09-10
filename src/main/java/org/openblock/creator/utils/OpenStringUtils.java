@@ -1,4 +1,4 @@
-package utils;
+package org.openblock.creator.utils;
 
 public interface OpenStringUtils {
 
