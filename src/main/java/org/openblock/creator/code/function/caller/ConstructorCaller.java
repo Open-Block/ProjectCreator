@@ -6,7 +6,7 @@ import org.openblock.creator.code.function.IConstructor;
 
 import java.util.stream.Collectors;
 
-public class ConstructorCaller extends FunctionCaller<IConstructor> implements Caller.Parameter {
+public class ConstructorCaller extends FunctionCaller<IConstructor> implements Caller.ParameterCaller {
 
     public ConstructorCaller(IConstructor constructor) {
         super(constructor);

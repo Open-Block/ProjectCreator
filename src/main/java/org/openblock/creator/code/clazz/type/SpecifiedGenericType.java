@@ -15,6 +15,10 @@ public class SpecifiedGenericType implements IType {
         this.generics = generics;
     }
 
+    public SpecifiedGenerics getGenerics(){
+        return this.generics;
+    }
+
     @Override
     public @NotNull String getName() {
         return this.generics.getDisplayName();

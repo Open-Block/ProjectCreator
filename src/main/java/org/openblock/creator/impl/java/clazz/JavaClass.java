@@ -172,4 +172,17 @@ public class JavaClass implements IClass {
     public boolean isAbstract() {
         return Modifier.isAbstract(this.clazz.getModifiers());
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof JavaClass jClass)) {
+            return false;
+        }
+        return this.clazz.equals(jClass.clazz);
+    }
+
+    @Override
+    public String toString() {
+        return "JavaClass[" + this.clazz.getName() + "]";
+    }
 }

@@ -8,6 +8,7 @@ import org.openblock.creator.code.function.IMethod;
 import org.openblock.creator.impl.custom.function.AbstractCustomFunction;
 import org.openblock.creator.impl.custom.function.CustomFunctionBuilder;
 
+import java.util.SortedSet;
 import java.util.stream.Collectors;
 
 public class CustomMethod extends AbstractCustomFunction implements IMethod {
@@ -81,5 +82,15 @@ public class CustomMethod extends AbstractCustomFunction implements IMethod {
     @Override
     public boolean isStatic() {
         return this.isStatic;
+    }
+
+    @Override
+    public boolean isAbstract() {
+        throw new RuntimeException("Not Implemented Yet");
+    }
+
+    @Override
+    public @NotNull SortedSet<IClass> getImports() {
+        throw new RuntimeException("Not Implemented Yet");
     }
 }

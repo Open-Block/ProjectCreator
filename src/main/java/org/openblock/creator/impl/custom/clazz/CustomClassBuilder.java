@@ -1,18 +1,17 @@
 package org.openblock.creator.impl.custom.clazz;
 
+import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.Visibility;
 import org.openblock.creator.code.clazz.ClassType;
 import org.openblock.creator.code.clazz.IClass;
+import org.openblock.creator.code.clazz.generic.IGeneric;
 import org.openblock.creator.code.clazz.generic.specified.NoGenerics;
 import org.openblock.creator.code.clazz.generic.specified.SpecifiedGenerics;
 import org.openblock.creator.impl.custom.clazz.interfacetype.CustomInterface;
 import org.openblock.creator.impl.custom.clazz.standardtype.CustomStandardClass;
 import org.openblock.creator.impl.custom.function.CustomFunctionBuilder;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class CustomClassBuilder {
 
@@ -22,15 +21,25 @@ public class CustomClassBuilder {
     private boolean isAbstract;
     private ClassType type;
     private Visibility visibility;
+    private List<IGeneric> generics = new ArrayList<>();
     private SpecifiedGenerics extending;
+    private Set<SpecifiedGenerics> implementing = new HashSet<>();
 
     private final List<CustomFunctionBuilder> functions = new ArrayList<>();
+
+    public @NotNull List<IGeneric> getGenerics() {
+        return this.generics;
+    }
+
+    public void addGeneric(IGeneric generic) {
+        this.generics.add(generic);
+    }
 
     public SpecifiedGenerics getExtending() {
         return extending;
     }
 
-    public CustomClassBuilder setExtending(IClass clazz) {
+    public @NotNull CustomClassBuilder setExtending(@NotNull IClass clazz) {
         if (clazz.getClassType() != ClassType.STANDARD) {
             throw new RuntimeException("Cannot extend classtype of " + clazz.getClassType().name() + ". If you are attempting to create a none standard class, then use addImplements()");
         }
@@ -38,8 +47,20 @@ public class CustomClassBuilder {
         return this;
     }
 
-    public CustomClassBuilder setExtending(SpecifiedGenerics extending) {
+    public @NotNull CustomClassBuilder setExtending(@NotNull SpecifiedGenerics extending) {
         this.extending = extending;
+        return this;
+    }
+
+    public @NotNull CustomClassBuilder addImplementing(@NotNull IClass clazz) {
+        if (clazz.getClassType() != ClassType.INTERFACE) {
+            throw new RuntimeException("Cannot implement classtype of " + clazz.getClassType().name() + ". If you are attempting to create a none interface class, then use setExtends()");
+        }
+        return addImplementing(new NoGenerics(clazz));
+    }
+
+    public @NotNull CustomClassBuilder addImplementing(@NotNull SpecifiedGenerics implementing) {
+        this.implementing.add(implementing);
         return this;
     }
 
@@ -117,7 +138,7 @@ public class CustomClassBuilder {
             case INTERFACE:
                 return new CustomInterface(this);
             default:
-                throw new IllegalStateException("Unexpected value: " + type);
+                throw new RuntimeException("Type of " + type + " is not implemented yet");
         }
     }
 }

@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.Codeable;
 import org.openblock.creator.code.call.Caller;
 import org.openblock.creator.code.clazz.IClass;
-import org.openblock.creator.code.function.IConstructor;
 import org.openblock.creator.code.function.IFunction;
 
 import java.util.ArrayList;
@@ -13,7 +12,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-public abstract class FunctionCaller<F extends IFunction> implements Caller.Parameter {
+public abstract class FunctionCaller<F extends IFunction> implements Caller.ParameterCaller {
 
     protected final F function;
     protected final List<Codeable> parameters = new ArrayList<>();

@@ -9,9 +9,9 @@ import java.util.List;
 
 public class NoGenerics implements SpecifiedGenerics {
 
-    private Nameable reference;
+    private final Nameable reference;
 
-    public NoGenerics(Nameable nameable) {
+    public NoGenerics(@NotNull Nameable nameable) {
         this.reference = nameable;
     }
 

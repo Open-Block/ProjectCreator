@@ -33,6 +33,10 @@ public abstract class AbstractCustomClass implements IClass {
                 .stream()
                 .map(f -> f.build(this))
                 .collect(Collectors.toList()));
+
+        if (this.name == null) {
+            throw new IllegalArgumentException("Name cannot be null");
+        }
     }
 
     @Override

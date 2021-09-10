@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.Visibility;
 import org.openblock.creator.code.call.returntype.ReturnType;
 import org.openblock.creator.code.call.returntype.StatedReturnType;
+import org.openblock.creator.code.variable.VariableCaller;
 
 public class UninitiatedField extends Field {
 
@@ -17,5 +18,10 @@ public class UninitiatedField extends Field {
     @Override
     public @NotNull ReturnType getReturnType() {
         return this.state;
+    }
+
+    @Override
+    public @NotNull VariableCaller<UninitiatedField> createCaller() {
+        return new VariableCaller<>(this);
     }
 }

@@ -6,6 +6,7 @@ import org.openblock.creator.code.clazz.IClass;
 import org.openblock.creator.code.clazz.type.BasicType;
 import org.openblock.creator.code.clazz.type.IType;
 import org.openblock.creator.code.variable.IVariable;
+import org.openblock.creator.code.variable.VariableCaller;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -47,7 +48,7 @@ public class Parameter implements IVariable {
     @Override
     public @NotNull String writeCode(int indent) {
         String ret = this.getReturnType().getDisplayText() + " " + this.getName();
-        if(this.isFinal()){
+        if (this.isFinal()) {
             ret = "final " + ret;
         }
         return ret;
@@ -57,9 +58,14 @@ public class Parameter implements IVariable {
     public @NotNull SortedSet<IClass> getImports() {
         SortedSet<IClass> set = new TreeSet<>();
         IType type = this.getReturnType().getType();
-        if(type instanceof BasicType b){
+        if (type instanceof BasicType b) {
             set.add(b.getTargetClass());
         }
         return set;
+    }
+
+    @Override
+    public @NotNull VariableCaller<Parameter> createCaller() {
+        return new VariableCaller<>(this);
     }
 }

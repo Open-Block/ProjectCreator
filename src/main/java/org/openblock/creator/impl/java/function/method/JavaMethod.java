@@ -25,8 +25,13 @@ public class JavaMethod extends JavaFunction implements IMethod {
     }
 
     @Override
+    public boolean isAbstract() {
+        throw new RuntimeException("Not Implemented Yet");
+    }
+
+    @Override
     public @NotNull StatedReturnType getReturnType() {
-        Method method = ((Method)this.method);
+        Method method = ((Method) this.method);
         Type returnType = method.getGenericReturnType();
         Class<?> returnClassType = method.getReturnType();
         SpecifiedGenerics generics = JavaGenerics.specified(new JavaClass(returnClassType), returnType);

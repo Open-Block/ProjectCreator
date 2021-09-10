@@ -17,6 +17,9 @@ public class CustomStandardClass extends AbstractCustomClass {
         super(builder);
         this.isAbstract = builder.isAbstract();
         this.extending = builder.getExtending();
+        if (this.isFinal && this.isAbstract) {
+            throw new IllegalArgumentException("Cannot have a class as abstract and final");
+        }
     }
 
     @Override

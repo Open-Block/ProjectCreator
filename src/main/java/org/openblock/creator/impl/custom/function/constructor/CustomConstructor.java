@@ -8,6 +8,8 @@ import org.openblock.creator.code.function.IConstructor;
 import org.openblock.creator.impl.custom.function.AbstractCustomFunction;
 import org.openblock.creator.impl.custom.function.CustomFunctionBuilder;
 
+import java.util.SortedSet;
+
 public class CustomConstructor extends AbstractCustomFunction implements IConstructor {
 
     public CustomConstructor(@NotNull IClass clazz, CustomFunctionBuilder builder) {
@@ -17,5 +19,10 @@ public class CustomConstructor extends AbstractCustomFunction implements IConstr
     @Override
     public @NotNull StatedReturnType getReturnType() {
         return new StatedReturnType(new BasicType(this.getTargetClass()), false);
+    }
+
+    @Override
+    public @NotNull SortedSet<IClass> getImports() {
+        throw new RuntimeException("Not implemented");
     }
 }

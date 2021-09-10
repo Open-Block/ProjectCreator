@@ -6,7 +6,7 @@ import org.openblock.creator.code.function.IMethod;
 
 import java.util.stream.Collectors;
 
-public class MethodCaller extends FunctionCaller<IMethod> implements Caller.Parameter {
+public class MethodCaller extends FunctionCaller<IMethod> implements Caller.ParameterCaller {
 
     public MethodCaller(IMethod function) {
         super(function);
