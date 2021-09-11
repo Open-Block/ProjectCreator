@@ -13,6 +13,7 @@ import org.openblock.creator.code.clazz.IClass;
 import org.openblock.creator.code.clazz.type.BasicType;
 import org.openblock.creator.code.clazz.type.IType;
 import org.openblock.creator.code.clazz.type.SpecifiedGenericType;
+import org.openblock.creator.code.clazz.type.VoidType;
 import org.openblock.creator.code.line.MultiLine;
 import org.openblock.creator.code.line.primitive.StringConstructor;
 import org.openblock.creator.code.statement.Statement;
@@ -20,8 +21,12 @@ import org.openblock.creator.code.variable.IVariable;
 import org.openblock.creator.code.variable.field.Field;
 import org.openblock.creator.code.variable.field.InitiatedField;
 import org.openblock.creator.code.variable.field.UninitiatedField;
+import org.openblock.creator.code.variable.parameter.Parameter;
+import org.openblock.creator.code.variable.parameter.WritableParameter;
 import org.openblock.creator.impl.custom.clazz.AbstractCustomClass;
 import org.openblock.creator.impl.custom.clazz.CustomClassBuilder;
+import org.openblock.creator.impl.custom.function.CustomFunctionBuilder;
+import org.openblock.creator.impl.custom.function.method.CustomMethod;
 import org.openblock.creator.project.Project;
 
 import java.util.*;
@@ -59,6 +64,7 @@ public class CustomClassReader {
 
     public AbstractCustomClass readStageTwo(Project<AbstractCustomClass> project, AbstractCustomClass target) {
         readFieldsInit(target, project);
+        readMethodsCodeInit(target, project);
         return target;
     }
 
@@ -223,6 +229,131 @@ public class CustomClassReader {
         throw new IllegalStateException("Unknown statement from line '" + statementLine + "'");
     }
 
+    private void readMethodsCodeInit(AbstractCustomClass clazz, Project<AbstractCustomClass> project) {
+        List<Integer> methodStartLineNumbers = new ArrayList<>();
+        for (int i = this.classStartsOn + 1; i < this.lines.size(); i++) {
+            String line = this.lines.get(i);
+            String whitespaceRemoved = line.trim().replaceAll(" ", "");
+            if (whitespaceRemoved.contains(clazz.getName() + "(")) {
+                //constructor
+                continue;
+            }
+            if (whitespaceRemoved.endsWith("){}")) {
+                methodStartLineNumbers.add(i);
+                continue;
+            }
+            if (whitespaceRemoved.endsWith("){")) {
+                methodStartLineNumbers.add(i);
+                continue;
+            }
+            if (whitespaceRemoved.endsWith(");")) {
+                methodStartLineNumbers.add(i);
+            }
+        }
+        for (int a = 0; a < methodStartLineNumbers.size(); a++) {
+            int lineNumber = methodStartLineNumbers.get(a);
+            String line = this.lines.get(lineNumber);
+            Integer genericStart = null;
+            Integer genericEnd = null;
+            int genericIn = 0;
+            int braceStart = 0;
+            int braceEnd = 0;
+            int braceIn = 0;
+            for (int b = 0; b < line.length(); b++) {
+                char at = line.charAt(b);
+                if (at == '<') {
+                    if (genericStart == null) {
+                        genericStart = b;
+                    }
+                    genericIn++;
+                }
+                if (at == '>') {
+                    genericEnd = b;
+                    genericIn--;
+                }
+                if (at == '(') {
+                    braceStart = b;
+                    braceIn++;
+                }
+                if (at == ')') {
+                    braceEnd = b;
+                    braceIn--;
+                    if (braceIn == 0) {
+                        break;
+                    }
+                }
+            }
+
+            //handle generics
+
+            //handle parameters
+            String parameterSector = line.substring(braceStart + 1, braceEnd);
+            String[] parameters = parameterSector.split(",");
+            List<Parameter> methodParameters = new ArrayList<>();
+            for (String pValue : parameters) {
+                String[] split = pValue.split(" ");
+                if (split.length < 2) {
+                    continue;
+                }
+                boolean isFinal = false;
+                if (split.length >= 3) {
+                    for (int c = 0; c < split.length - 2; c++) {
+                        String command = split[c];
+                        if (command.equals("final")) {
+                            isFinal = true;
+                            break; //temp
+                        }
+                        //annotations
+                    }
+                }
+                String clazzString = split[split.length - 2];
+                String varString = split[split.length - 1];
+                StatedReturnType clazzRead = readClass(clazzString, project);
+                WritableParameter parameter = new WritableParameter(clazzRead, varString, isFinal);
+                methodParameters.add(parameter);
+            }
+
+            //method pre line
+            String methodInit = line.substring(0, braceStart);
+            boolean isFinal = false;
+            boolean isStatic = false;
+            Visibility visibility = Visibility.PACKAGED;
+
+            if (methodInit.contains(" final ")) {
+                isFinal = true;
+            }
+            if (methodInit.contains(" static ")) {
+                isStatic = true;
+            }
+            for (Visibility vis : Visibility.values()) {
+                if (methodInit.contains(vis.getDisplayName())) {
+                    visibility = vis;
+                }
+            }
+
+            String[] split = methodInit.split(" ");
+            if (split.length < 2) {
+                throw new IllegalStateException("Could not split the spaces by 2 or more in: '" + methodInit + "' -> '" + line + "'");
+            }
+            String name = split[split.length - 1];
+            String returnTypeString = split[split.length - 2];
+            StatedReturnType returnType = readClass(returnTypeString, project);
+
+            // method creation
+            CustomMethod method = (CustomMethod) new CustomFunctionBuilder()
+                    .setName(name)
+                    .setReturnType(returnType)
+                    .setVisibility(visibility)
+                    .addParameters(methodParameters)
+                    .build(clazz);
+
+            //add to class
+            clazz.getFunctions().add(method);
+        }
+
+
+    }
+
     private void readFieldsCode(AbstractCustomClass clazz, Project<AbstractCustomClass> project) {
         List<Integer> fieldLineNumbers = new ArrayList<>();
         for (int i = this.classStartsOn + 1; i < this.lines.size(); i++) {
@@ -363,6 +494,9 @@ public class CustomClassReader {
     }
 
     private StatedReturnType readClass(String clazz, Project<AbstractCustomClass> project) {
+        if (clazz.equals("void")) {
+            return new StatedReturnType(new VoidType(), false);
+        }
         if (!clazz.contains(Pattern.quote("."))) {
             String finalClazz = clazz;
             Optional<String> opImp = this.importLines.stream().filter(l -> l.endsWith(finalClazz)).findAny();

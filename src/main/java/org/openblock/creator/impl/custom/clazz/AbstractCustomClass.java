@@ -13,15 +13,15 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractCustomClass implements IClass {
 
-    protected String name;
-    protected String[] pack;
-    protected boolean isFinal;
-    protected Visibility visibility;
-    protected List<IGeneric> generics = new ArrayList<>();
-    protected List<Field> fields = new ArrayList<>();
-    protected SortedSet<SpecifiedGenerics> implementations = new TreeSet<>(Comparator.comparing((g) -> ((IClass) g.getTargetReference())));
-    protected Set<IClass> nestedClasses = new HashSet<>();
-    protected Set<IFunction> functions = new HashSet<>();
+    protected final String name;
+    protected final String[] pack;
+    protected final boolean isFinal;
+    protected final Visibility visibility;
+    protected @NotNull List<IGeneric> generics = new ArrayList<>();
+    protected @NotNull List<Field> fields = new ArrayList<>();
+    protected @NotNull SortedSet<SpecifiedGenerics> implementations = new TreeSet<>(Comparator.comparing((g) -> ((IClass) g.getTargetReference())));
+    protected @NotNull Set<IClass> nestedClasses = new HashSet<>();
+    protected @NotNull Set<IFunction> functions = new HashSet<>();
 
     public AbstractCustomClass(CustomClassBuilder builder) {
         this.name = builder.getName();
@@ -65,27 +65,27 @@ public abstract class AbstractCustomClass implements IClass {
     }
 
     @Override
-    public List<IGeneric> getGenerics() {
+    public @NotNull List<IGeneric> getGenerics() {
         return this.generics;
     }
 
     @Override
-    public List<Field> getFields() {
+    public @NotNull List<Field> getFields() {
         return this.fields;
     }
 
     @Override
-    public SortedSet<SpecifiedGenerics> getImplements() {
+    public @NotNull SortedSet<SpecifiedGenerics> getImplements() {
         return this.implementations;
     }
 
     @Override
-    public Set<IClass> getNestedClasses() {
+    public @NotNull Set<IClass> getNestedClasses() {
         return this.nestedClasses;
     }
 
     @Override
-    public Set<IFunction> getFunctions() {
+    public @NotNull Set<IFunction> getFunctions() {
         return this.functions;
     }
 }

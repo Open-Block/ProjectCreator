@@ -21,9 +21,9 @@ public class CustomClassBuilder {
     private boolean isAbstract;
     private ClassType type;
     private Visibility visibility;
-    private List<IGeneric> generics = new ArrayList<>();
+    private final @NotNull List<IGeneric> generics = new ArrayList<>();
     private SpecifiedGenerics extending;
-    private Set<SpecifiedGenerics> implementing = new HashSet<>();
+    private final @NotNull Set<SpecifiedGenerics> implementing = new HashSet<>();
 
     private final List<CustomFunctionBuilder> functions = new ArrayList<>();
 
@@ -132,13 +132,12 @@ public class CustomClassBuilder {
     }
 
     public AbstractCustomClass build() {
-        switch (this.type) {
-            case STANDARD:
-                return new CustomStandardClass(this);
-            case INTERFACE:
-                return new CustomInterface(this);
-            default:
-                throw new RuntimeException("Type of " + type + " is not implemented yet");
-        }
+        AbstractCustomClass clazz = switch (this.type) {
+            case STANDARD -> new CustomStandardClass(this);
+            case INTERFACE -> new CustomInterface(this);
+            default -> throw new RuntimeException("Type of " + type + " is not implemented yet");
+        };
+        clazz.implementations.addAll(this.implementing);
+        return clazz;
     }
 }
