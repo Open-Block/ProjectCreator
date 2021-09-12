@@ -14,8 +14,11 @@ import org.openblock.creator.code.clazz.type.BasicType;
 import org.openblock.creator.code.clazz.type.IType;
 import org.openblock.creator.code.clazz.type.SpecifiedGenericType;
 import org.openblock.creator.code.clazz.type.VoidType;
+import org.openblock.creator.code.function.IFunction;
+import org.openblock.creator.code.line.Line;
 import org.openblock.creator.code.line.MultiLine;
 import org.openblock.creator.code.line.primitive.StringConstructor;
+import org.openblock.creator.code.line.returning.ReturnLine;
 import org.openblock.creator.code.statement.Statement;
 import org.openblock.creator.code.variable.IVariable;
 import org.openblock.creator.code.variable.field.Field;
@@ -70,6 +73,7 @@ public class CustomClassReader {
 
     public AbstractCustomClass readStageThree(Project<AbstractCustomClass> project, AbstractCustomClass target) {
         readFieldsCode(target, project);
+        readMethodsCode(target, project);
         return target;
     }
 
@@ -91,7 +95,7 @@ public class CustomClassReader {
 
     private List<String> getCodeBlock(List<String> block, final int lineStart, int bracesFound) {
         boolean inString = false;
-        for (int a = 0; a < block.size(); a++) {
+        for (int a = lineStart; a < block.size(); a++) {
             String line = block.get(a);
             for (int i = 0; i < line.length(); i++) {
                 char at = line.charAt(i);
@@ -137,7 +141,7 @@ public class CustomClassReader {
         return ret;
     }
 
-    private Returnable.ReturnableLine readNoneChainedCode(@NotNull String line, @Nullable Codeable previous, @NotNull Collection<IVariable> variables, @NotNull AbstractCustomClass clazz, @NotNull Project<AbstractCustomClass> project) {
+    private Line readNoneChainedCode(@NotNull String line, @Nullable Codeable previous, @NotNull Collection<IVariable> variables, @NotNull AbstractCustomClass clazz, @NotNull Project<AbstractCustomClass> project) {
         line = line.trim();
         if (line.endsWith(";")) {
             line = line.substring(0, line.length() - 1);
@@ -157,6 +161,13 @@ public class CustomClassReader {
             return new StringConstructor(line.substring(1, line.length() - 1));
         }
 
+        if (line.startsWith("return ")) {
+            Line result = readNoneChainedCode(line.substring(7), previous, variables, clazz, project);
+            if (result instanceof Returnable.ReturnableLine resultLine) {
+                return new ReturnLine(resultLine);
+            }
+            throw new IllegalStateException("Line does not return a value: '" + line.substring(7) + "'");
+        }
         throw new IllegalStateException("Unknown line of '" + line + "'");
     }
 
@@ -182,11 +193,11 @@ public class CustomClassReader {
                         multiLine.getLines().add(lineToAdd);
                     }
                 } else {
-                    Returnable.ReturnableLine toAdd = readNoneChainedCode(current, codeable, variables, clazz, project);
+                    Line toAdd = readNoneChainedCode(current, codeable, variables, clazz, project);
                     if (codeable == null) {
                         codeable = toAdd;
-                    } else if (codeable instanceof MultiLine multiLine) {
-                        multiLine.getLines().add(toAdd);
+                    } else if (codeable instanceof MultiLine multiLine && toAdd instanceof Returnable.ReturnableLine toAddLine) {
+                        multiLine.getLines().add(toAddLine);
                     }
                 }
                 buffer = new StringBuilder();
@@ -202,11 +213,11 @@ public class CustomClassReader {
                 multiLine.getLines().add(lineToAdd);
             }
         } else {
-            Returnable.ReturnableLine toAdd = readNoneChainedCode(current, codeable, variables, clazz, project);
+            Line toAdd = readNoneChainedCode(current, codeable, variables, clazz, project);
             if (codeable == null) {
                 codeable = toAdd;
-            } else if (codeable instanceof MultiLine multiLine) {
-                multiLine.getLines().add(toAdd);
+            } else if (codeable instanceof MultiLine multiLine && toAdd instanceof Returnable.ReturnableLine toAddLine) {
+                multiLine.getLines().add(toAddLine);
             }
         }
         return codeable;
@@ -229,7 +240,7 @@ public class CustomClassReader {
         throw new IllegalStateException("Unknown statement from line '" + statementLine + "'");
     }
 
-    private void readMethodsCodeInit(AbstractCustomClass clazz, Project<AbstractCustomClass> project) {
+    private void readMethodsCode(AbstractCustomClass clazz, Project<AbstractCustomClass> project) {
         List<Integer> methodStartLineNumbers = new ArrayList<>();
         for (int i = this.classStartsOn + 1; i < this.lines.size(); i++) {
             String line = this.lines.get(i);
@@ -239,19 +250,117 @@ public class CustomClassReader {
                 continue;
             }
             if (whitespaceRemoved.endsWith("){}")) {
+                //find better check for this
                 methodStartLineNumbers.add(i);
                 continue;
             }
             if (whitespaceRemoved.endsWith("){")) {
+                //find better check for this
                 methodStartLineNumbers.add(i);
+                i = this.getCodeBlock(i + 1, 1).size();
                 continue;
             }
             if (whitespaceRemoved.endsWith(");")) {
+                //find better check for this
                 methodStartLineNumbers.add(i);
             }
         }
-        for (int a = 0; a < methodStartLineNumbers.size(); a++) {
-            int lineNumber = methodStartLineNumbers.get(a);
+        for (IFunction function : clazz.getFunctions()) {
+            Integer lineNumber = null;
+            for (int methodStart : methodStartLineNumbers) {
+                String methodLinedTrimmed = this.lines.get(methodStart).trim();
+                if (!methodLinedTrimmed.contains(function.getName())) {
+                    continue;
+                }
+                lineNumber = methodStart;
+                break;
+            }
+            if (lineNumber == null) {
+                continue;
+            }
+            List<String> lines = this.getCodeBlock(lineNumber + 1, 1);
+            List<Codeable> codableBlock = this.readCodeBlock(lines, new ArrayList<>(function.getParameters()), clazz, project);
+            function.getCodeBlock().addAll(codableBlock);
+        }
+    }
+
+    private void readMethodsCodeInit(AbstractCustomClass clazz, Project<AbstractCustomClass> project) {
+        List<Integer> methodStartLineNumbers = new ArrayList<>();
+        for (int i = this.classStartsOn + 1; i < this.lines.size(); i++) {
+            String line = this.lines.get(i);
+
+            String whitespaceRemoved = line.trim().replaceAll(" ", "");
+            if (line.trim().length() == whitespaceRemoved.length()) {
+                continue;
+            }
+            if (!whitespaceRemoved.contains("(")) {
+                continue;
+            }
+            if (!whitespaceRemoved.contains(")")) {
+                continue;
+            }
+            Integer parameterStart = null;
+            Integer parameterEnd = null;
+            for (int a = 0; a < line.length(); a++) {
+                char charAt = line.charAt(a);
+                if (parameterStart == null && charAt == '(') {
+                    parameterStart = a;
+                    continue;
+                }
+                if (parameterEnd == null && charAt == ')') {
+                    parameterEnd = a;
+                    continue;
+                }
+                if (parameterStart != null && charAt == '(') {
+                    parameterStart = null;
+                    break;
+                }
+                if (parameterEnd != null && charAt == ')') {
+                    parameterStart = null;
+                    break;
+                }
+            }
+            if (parameterStart == null || parameterEnd == null) {
+                continue;
+            }
+            String paramString = line.substring(parameterStart + 1, parameterEnd);
+            if (paramString.length() != 0) {
+                if (paramString.split(",").length > 0) {
+                    boolean has = true;
+                    for (String param : paramString.split(",")) {
+                        if (!param.contains(" ")) {
+                            has = false;
+                            break;
+                        }
+                    }
+                    if (!has) {
+                        continue;
+                    }
+                } else if (paramString.split(" ").length > 1) {
+                    continue;
+                }
+            }
+            if (whitespaceRemoved.contains(clazz.getName() + "(")) {
+                //constructor
+                continue;
+            }
+            if (whitespaceRemoved.endsWith("){}")) {
+                //Find better check for this
+                methodStartLineNumbers.add(i);
+                continue;
+            }
+            if (whitespaceRemoved.endsWith("){")) {
+                //Find better check for this
+                methodStartLineNumbers.add(i);
+                i = this.getCodeBlock(i + 1, 1).size();
+                continue;
+            }
+            if (whitespaceRemoved.endsWith(");")) {
+                //find better check for this
+                methodStartLineNumbers.add(i);
+            }
+        }
+        for (int lineNumber : methodStartLineNumbers) {
             String line = this.lines.get(lineNumber);
             Integer genericStart = null;
             Integer genericEnd = null;
@@ -315,13 +424,8 @@ public class CustomClassReader {
 
             //method pre line
             String methodInit = line.substring(0, braceStart);
-            boolean isFinal = false;
             boolean isStatic = false;
             Visibility visibility = Visibility.PACKAGED;
-
-            if (methodInit.contains(" final ")) {
-                isFinal = true;
-            }
             if (methodInit.contains(" static ")) {
                 isStatic = true;
             }
@@ -345,6 +449,7 @@ public class CustomClassReader {
                     .setReturnType(returnType)
                     .setVisibility(visibility)
                     .addParameters(methodParameters)
+                    .setStatic(isStatic)
                     .build(clazz);
 
             //add to class
