@@ -257,7 +257,7 @@ public class CustomClassReader {
             if (whitespaceRemoved.endsWith("){")) {
                 //find better check for this
                 methodStartLineNumbers.add(i);
-                i = this.getCodeBlock(i + 1, 1).size();
+                i = i + this.getCodeBlock(i + 1, 1).size();
                 continue;
             }
             if (whitespaceRemoved.endsWith(");")) {
@@ -352,7 +352,7 @@ public class CustomClassReader {
             if (whitespaceRemoved.endsWith("){")) {
                 //Find better check for this
                 methodStartLineNumbers.add(i);
-                i = this.getCodeBlock(i + 1, 1).size();
+                i = i + this.getCodeBlock(i + 1, 1).size();
                 continue;
             }
             if (whitespaceRemoved.endsWith(");")) {
