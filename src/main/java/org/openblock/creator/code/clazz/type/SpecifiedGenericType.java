@@ -2,8 +2,10 @@ package org.openblock.creator.code.clazz.type;
 
 import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.clazz.IClass;
+import org.openblock.creator.code.clazz.generic.IGeneric;
 import org.openblock.creator.code.clazz.generic.specified.SpecifiedGenerics;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,7 +17,7 @@ public class SpecifiedGenericType implements IType {
         this.generics = generics;
     }
 
-    public SpecifiedGenerics getGenerics(){
+    public SpecifiedGenerics getGenerics() {
         return this.generics;
     }
 
@@ -26,9 +28,12 @@ public class SpecifiedGenericType implements IType {
 
     @Override
     public List<IClass> getClasses() {
-        return this
-                .generics
-                .getGenerics()
+        List<IGeneric> generics = this.generics.getGenerics();
+        if (generics.isEmpty() && this.generics.getTargetReference() instanceof IClass clazz) {
+            return Collections.singletonList(clazz);
+        }
+
+        return generics
                 .parallelStream()
                 .flatMap(s -> s.getClasses().parallelStream())
                 .flatMap(t -> t.getClasses().parallelStream())

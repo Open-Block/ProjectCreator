@@ -2,6 +2,7 @@ package org.openblock.creator.code.clazz.generic.specified;
 
 import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.Nameable;
+import org.openblock.creator.code.clazz.IClass;
 import org.openblock.creator.code.clazz.generic.IGeneric;
 
 import java.util.List;
@@ -14,6 +15,10 @@ public interface SpecifiedGenerics {
     List<SpecifiedGenerics> getSpecifiedGenericClass();
 
     @NotNull Nameable getTargetReference();
+
+    default boolean hasInheritance(IClass clazz) {
+        return this.getGenerics().parallelStream().anyMatch(gen -> gen.hasInheritance(clazz));
+    }
 
     default @NotNull String getDisplayName() {
         StringBuilder builder = new StringBuilder(this.getTargetReference().getName());

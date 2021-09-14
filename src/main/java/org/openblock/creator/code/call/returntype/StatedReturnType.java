@@ -5,8 +5,7 @@ import org.openblock.creator.code.clazz.type.IType;
 
 public class StatedReturnType implements ReturnType {
 
-    private final @NotNull
-    IType type;
+    private final @NotNull IType type;
     private final boolean isArray;
 
     public StatedReturnType(@NotNull IType type, boolean isArray) {
@@ -15,8 +14,7 @@ public class StatedReturnType implements ReturnType {
     }
 
     @Override
-    public @NotNull
-    IType getType() {
+    public @NotNull IType getType() {
         return type;
     }
 

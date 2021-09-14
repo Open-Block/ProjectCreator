@@ -3,6 +3,7 @@ package org.openblock.creator.code.clazz.generic;
 import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.Codeable;
 import org.openblock.creator.code.Nameable;
+import org.openblock.creator.code.clazz.IClass;
 import org.openblock.creator.code.clazz.type.IType;
 
 import java.util.List;
@@ -22,5 +23,9 @@ public interface IGeneric extends Nameable, Codeable {
     @Override
     default @NotNull String writeCode(int indent) {
         return writeCode();
+    }
+
+    default boolean hasInheritance(IClass clazz) {
+        return this.getClasses().parallelStream().anyMatch(type -> type.hasInheritance(clazz));
     }
 }

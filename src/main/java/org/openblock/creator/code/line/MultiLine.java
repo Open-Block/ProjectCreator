@@ -1,38 +1,37 @@
 package org.openblock.creator.code.line;
 
 import org.jetbrains.annotations.NotNull;
-import org.openblock.creator.code.call.Returnable;
-import org.openblock.creator.code.call.returntype.ReturnType;
+import org.openblock.creator.code.call.Caller;
 import org.openblock.creator.code.clazz.IClass;
 import org.openblock.creator.utils.OpenStringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class MultiLine implements Returnable.ReturnableLine {
+public class MultiLine implements CallingLine {
 
-    private final List<Returnable.ReturnableLine> lines = new ArrayList<>();
+    private final List<CallingLine> lines = new ArrayList<>();
 
     @Deprecated
     public MultiLine() {
         throw new RuntimeException("MultiLine requires 1 returnable or more");
     }
 
-    public MultiLine(Returnable.ReturnableLine... lines) {
+    public MultiLine(CallingLine... lines) {
         this(Arrays.asList(lines));
     }
 
-    public MultiLine(Collection<Returnable.ReturnableLine> lines) {
+    public MultiLine(Collection<CallingLine> lines) {
         this.lines.addAll(lines);
     }
 
-    public List<Returnable.ReturnableLine> getLines() {
+    public List<CallingLine> getLines() {
         return this.lines;
     }
 
     @Override
     public @NotNull String writeCode(int indent) {
-        return OpenStringUtils.repeat(indent, '\t') + this.lines.stream().map(l -> l.writeCode(0)).collect(Collectors.joining("."));
+        return OpenStringUtils.repeat(indent, '\t') + this.lines.stream().map(l -> ((Line) l).writeCode(0)).collect(Collectors.joining("."));
     }
 
     @Override
@@ -40,12 +39,12 @@ public class MultiLine implements Returnable.ReturnableLine {
         return this
                 .lines
                 .parallelStream()
-                .flatMap(l -> l.getImports().parallelStream())
+                .flatMap(l -> ((Line) l).getImports().parallelStream())
                 .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(IClass::getFullName))));
     }
 
     @Override
-    public @NotNull ReturnType getReturnType() {
-        return this.lines.get(this.lines.size() - 1).getReturnType();
+    public TreeSet<Caller> getCallers() {
+        return this.lines.get(this.lines.size() - 1).getCallers();
     }
 }
