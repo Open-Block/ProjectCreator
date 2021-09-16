@@ -885,7 +885,7 @@ public class CustomClassReader {
             throw new IllegalStateException("no package tag");
         }
         if (!packageLine.endsWith(";")) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Package doesnt end with ';'");
         }
         String packageName = packageLine.substring(8, packageLine.length() - 1);
         this.builder.setPackageLocation(packageName.split(Pattern.quote(".")));
