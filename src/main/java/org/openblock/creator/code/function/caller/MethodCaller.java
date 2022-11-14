@@ -8,12 +8,14 @@ import java.util.stream.Collectors;
 
 public class MethodCaller extends FunctionCaller<IMethod> implements Caller.ParameterCaller {
 
-    public MethodCaller(IMethod function) {
-        super(function);
-    }
+	public MethodCaller(IMethod function) {
+		super(function);
+	}
 
-    @Override
-    public @NotNull String writeCode(int indent) {
-        return this.getCallable().getTargetClass().getName() + "(" + this.parameters.stream().map(p -> p.writeCode(0)).collect(Collectors.joining(", ")) + ")";
-    }
+	@Override
+	public @NotNull String writeCode(int indent) {
+		return this.getCallable().getTargetClass().getName() + "(" + this.parameters.stream()
+				.map(p -> p.writeCode(0))
+				.collect(Collectors.joining(", ")) + ")";
+	}
 }

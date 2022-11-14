@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.openblock.creator.code.Codeable;
 import org.openblock.creator.code.call.Caller;
 import org.openblock.creator.code.clazz.IClass;
+import org.openblock.creator.code.clazz.caller.CallerBuilder;
 import org.openblock.creator.code.function.IFunction;
 
 import java.util.ArrayList;
@@ -14,32 +15,37 @@ import java.util.stream.Collectors;
 
 public abstract class FunctionCaller<F extends IFunction> implements Caller.ParameterCaller {
 
-    protected final F function;
-    protected final List<Codeable> parameters = new ArrayList<>();
+	protected final F function;
+	protected final List<Codeable> parameters = new ArrayList<>();
 
-    public FunctionCaller(F function) {
-        this.function = function;
-    }
+	public FunctionCaller(F function) {
+		this.function = function;
+	}
 
-    @Override
-    public F getCallable() {
-        return this.function;
-    }
+	@Override
+	public F getCallable() {
+		return this.function;
+	}
 
-    @Override
-    public @NotNull SortedSet<IClass> getImports() {
-        SortedSet<IClass> set = new TreeSet<>();
-        set.add(this.getCallable().getTargetClass());
-        set.addAll(this
-                .getParameters()
-                .parallelStream()
-                .flatMap(c -> c.getImports().parallelStream())
-                .collect(Collectors.toSet()));
-        return set;
-    }
+	@Override
+	public @NotNull SortedSet<IClass> getImports() {
+		SortedSet<IClass> set = new TreeSet<>();
+		set.add(this.getCallable().getTargetClass());
+		set.addAll(this
+				.getParameters()
+				.parallelStream()
+				.flatMap(c -> c.getImports().parallelStream())
+				.collect(Collectors.toSet()));
+		return set;
+	}
 
-    @Override
-    public List<Codeable> getParameters() {
-        return this.parameters;
-    }
+	@Override
+	public @NotNull CallerBuilder toBuilder() {
+		return new CallerBuilder().setCaller(this.function);
+	}
+
+	@Override
+	public List<Codeable> getParameters() {
+		return this.parameters;
+	}
 }

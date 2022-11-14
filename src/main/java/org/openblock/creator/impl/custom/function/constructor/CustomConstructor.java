@@ -12,17 +12,27 @@ import java.util.SortedSet;
 
 public class CustomConstructor extends AbstractCustomFunction implements IConstructor {
 
-    public CustomConstructor(@NotNull IClass clazz, CustomFunctionBuilder builder) {
-        super(clazz, builder);
-    }
+	public CustomConstructor(@NotNull IClass clazz, CustomFunctionBuilder builder) {
+		super(clazz, builder);
+	}
 
-    @Override
-    public @NotNull StatedReturnType getReturnType() {
-        return new StatedReturnType(new BasicType(this.getTargetClass()), false);
-    }
+	@Override
+	public @NotNull StatedReturnType getReturnType() {
+		return new StatedReturnType(new BasicType(this.getTargetClass()), false);
+	}
 
-    @Override
-    public @NotNull SortedSet<IClass> getImports() {
-        throw new RuntimeException("Not implemented");
-    }
+	@Override
+	public @NotNull SortedSet<IClass> getImports() {
+		throw new RuntimeException("Not implemented");
+	}
+
+	@Override
+	public @NotNull CustomFunctionBuilder toBuilder() {
+		return new CustomFunctionBuilder()
+				.setClassFor(this.getTargetClass())
+				.setVisibility(this.getVisibility())
+				.addCodeBlock(this.getCodeBlock())
+				.addGenerics(this.getGenerics())
+				.addParameters(this.getParameters());
+	}
 }

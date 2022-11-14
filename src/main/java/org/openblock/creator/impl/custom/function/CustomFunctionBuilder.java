@@ -2,6 +2,7 @@ package org.openblock.creator.impl.custom.function;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.openblock.creator.code.CodeBuilder;
 import org.openblock.creator.code.Codeable;
 import org.openblock.creator.code.Visibility;
 import org.openblock.creator.code.call.returntype.ReturnType;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class CustomFunctionBuilder {
+public class CustomFunctionBuilder implements CodeBuilder<CustomFunctionBuilder> {
 
     protected String name;
     protected Visibility visibility;
@@ -24,6 +25,16 @@ public class CustomFunctionBuilder {
     protected List<Parameter> parameters = new ArrayList<>();
     protected List<IGeneric> generics = new ArrayList<>();
     protected List<Codeable> codeBlock = new ArrayList<>();
+    protected IClass classFor;
+
+    public IClass getClassFor() {
+        return classFor;
+    }
+
+    public CustomFunctionBuilder setClassFor(IClass classFor) {
+        this.classFor = classFor;
+        return this;
+    }
 
     public ReturnType getReturnType() {
         return returnType;
@@ -99,5 +110,10 @@ public class CustomFunctionBuilder {
             throw new RuntimeException("A Name was specified without a ReturnType. Please either don't specify either or both");
         }
         return new CustomMethod(clazz, this);
+    }
+
+    @Override
+    public Codeable build() {
+        return build(this.classFor);
     }
 }

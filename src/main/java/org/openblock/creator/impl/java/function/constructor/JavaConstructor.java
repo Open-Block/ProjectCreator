@@ -5,6 +5,7 @@ import org.openblock.creator.code.call.returntype.ReturnType;
 import org.openblock.creator.code.call.returntype.StatedReturnType;
 import org.openblock.creator.code.clazz.type.BasicType;
 import org.openblock.creator.code.function.IConstructor;
+import org.openblock.creator.impl.custom.function.CustomFunctionBuilder;
 import org.openblock.creator.impl.java.clazz.JavaClass;
 import org.openblock.creator.impl.java.function.JavaFunction;
 
@@ -26,5 +27,12 @@ public class JavaConstructor<C extends Class<?>> extends JavaFunction implements
     public @NotNull ReturnType getReturnType() {
         Class<?> clazz = this.method.getDeclaringClass();
         return new StatedReturnType(new BasicType(new JavaClass(clazz)), false);
+    }
+
+    @Override
+    public @NotNull CustomFunctionBuilder toBuilder() {
+        return new CustomFunctionBuilder()
+                .setVisibility(this.getVisibility())
+                .setClassFor(this.getTargetClass());
     }
 }

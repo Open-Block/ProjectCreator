@@ -13,7 +13,7 @@ public class JavaClassWriter extends AbstractClassWriter<JavaClass> implements C
     @Override
     public @NotNull String write(JavaClass clazz) {
         String imports = this.writeImports(clazz);
-        if (imports.length() != 0) {
+        if (!imports.isEmpty()) {
             imports = imports + "\n\n";
         }
         List<Field> fields = clazz.getFields();

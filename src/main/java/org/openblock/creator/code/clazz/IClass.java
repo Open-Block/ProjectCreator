@@ -14,6 +14,7 @@ import org.openblock.creator.code.clazz.generic.specified.SpecifiedGenerics;
 import org.openblock.creator.code.function.IFunction;
 import org.openblock.creator.code.function.IMethod;
 import org.openblock.creator.code.variable.field.Field;
+import org.openblock.creator.impl.custom.clazz.CustomClassBuilder;
 import org.openblock.creator.impl.custom.function.method.CustomMethod;
 
 import java.util.*;
@@ -21,85 +22,112 @@ import java.util.stream.Collectors;
 
 public interface IClass extends Nameable, Codeable, CallerProvider, Abstractable, Comparable<IClass> {
 
-    @NotNull String[] getPackage();
+	@Override
+	@NotNull CustomClassBuilder toBuilder();
 
-    boolean isFinal();
+	@NotNull String[] getPackage();
 
-    @NotNull ClassType getClassType();
+	boolean isFinal();
 
-    @NotNull Visibility getVisibility();
+	@NotNull ClassType getClassType();
 
-    List<IGeneric> getGenerics();
+	@NotNull Visibility getVisibility();
 
-    List<Field> getFields();
+	List<IGeneric> getGenerics();
 
-    Optional<SpecifiedGenerics> getExtendingClass();
+	List<Field> getFields();
 
-    SortedSet<SpecifiedGenerics> getImplements();
+	Optional<SpecifiedGenerics> getExtendingClass();
 
-    Set<IClass> getNestedClasses();
+	Collection<SpecifiedGenerics> getImplements();
 
-    Set<IFunction> getFunctions();
+	Collection<IClass> getNestedClasses();
 
-    @Override
-    default TreeSet<Caller> getCallers() {
-        Set<Callable> callables = new HashSet<>();
-        callables.addAll(this.getFields());
-        callables.addAll(this.getFunctions(IMethod.class));
-        TreeSet<Caller> set = callables.parallelStream().map(Callable::createCaller).collect(Collectors.toCollection(() -> new TreeSet<>(OpenCompares.CALLER_COMPARE)));
-        return set;
-    }
+	Collection<IFunction> getFunctions();
 
-    default TreeSet<Caller> getStaticCallers() {
-        TreeSet<Caller> callers = new TreeSet<>(OpenCompares.CALLER_COMPARE);
-        callers.addAll(this.getFields().stream().filter(Field::isStatic).map(Callable::createCaller).collect(Collectors.toSet()));
-        callers.addAll(this.getFunctions(CustomMethod.class).stream().filter(CustomMethod::isStatic).map(Callable::createCaller).collect(Collectors.toSet()));
-        return callers;
-    }
+	@Override
+	default TreeSet<Caller> getCallers() {
+		Set<Callable> callables = new HashSet<>();
+		callables.addAll(this.getFields());
+		callables.addAll(this.getFunctions(IMethod.class));
+		TreeSet<Caller> set = callables.parallelStream()
+				.map(Callable::createCaller)
+				.collect(Collectors.toCollection(() -> new TreeSet<>(OpenCompares.CALLER_COMPARE)));
+		return set;
+	}
 
-    default @NotNull String getFullName() {
-        return String.join(".", this.getPackage()) + "." + this.getName();
-    }
+	default TreeSet<Caller> getStaticCallers() {
+		TreeSet<Caller> callers = new TreeSet<>(OpenCompares.CALLER_COMPARE);
+		callers.addAll(this.getFields()
+				.stream()
+				.filter(Field::isStatic)
+				.map(Callable::createCaller)
+				.collect(Collectors.toSet()));
+		callers.addAll(this.getFunctions(CustomMethod.class)
+				.stream()
+				.filter(CustomMethod::isStatic)
+				.map(Callable::createCaller)
+				.collect(Collectors.toSet()));
+		return callers;
+	}
 
-    default <F extends IFunction> Set<F> getFunctions(Class<F> clazz) {
-        return this.getFunctions().parallelStream().filter(clazz::isInstance).map(f -> (F) f).collect(Collectors.toSet());
-    }
+	default @NotNull String getFullName() {
+		return String.join(".", this.getPackage()) + "." + this.getName();
+	}
 
-    default boolean hasInheritance(IClass clazz) {
-        if (clazz.equals(this)) {
-            return true;
-        }
-        boolean iImpl = this.getImplements().parallelStream().anyMatch(iface -> iface.hasInheritance(clazz));
-        if (iImpl) {
-            return true;
-        }
-        Optional<SpecifiedGenerics> opExtending = this.getExtendingClass();
-        return opExtending
-                .map(specifiedGenerics -> specifiedGenerics.hasInheritance(clazz))
-                .orElse(false);
+	default <F extends IFunction> List<F> getFunctions(Class<F> clazz) {
+		return this.getFunctions()
+				.parallelStream()
+				.filter(clazz::isInstance)
+				.map(f -> (F) f)
+				.toList();
+	}
 
-    }
+	default boolean hasInheritance(IClass clazz) {
+		if (clazz.equals(this)) {
+			return true;
+		}
+		boolean iImpl = this.getImplements().parallelStream().anyMatch(iface -> iface.hasInheritance(clazz));
+		if (iImpl) {
+			return true;
+		}
+		Optional<SpecifiedGenerics> opExtending = this.getExtendingClass();
+		return opExtending
+				.map(specifiedGenerics -> specifiedGenerics.hasInheritance(clazz))
+				.orElse(false);
 
-    @Override
-    default int compareTo(@NotNull IClass o) {
-        return this.getFullName().compareTo(o.getFullName());
-    }
+	}
 
-    default @NotNull StaticClassCaller createStaticCaller() {
-        return new StaticClassCaller(this);
-    }
+	@Override
+	default int compareTo(@NotNull IClass o) {
+		return this.getFullName().compareTo(o.getFullName());
+	}
 
-    @Override
-    default @NotNull SortedSet<IClass> getImports() {
-        TreeSet<IClass> classes = new TreeSet<>();
-        classes.addAll(this.getFields().parallelStream().flatMap(f -> f.getReturnType().getType().getClasses().parallelStream()).collect(Collectors.toList()));
-        classes.addAll(this.getFunctions().parallelStream().flatMap(f -> f.getImports().parallelStream()).collect(Collectors.toSet()));
-        classes.addAll(this.getImplements().parallelStream().filter(g -> g.getTargetReference() instanceof IClass).map(g -> (IClass) g.getTargetReference()).collect(Collectors.toSet()));
-        this.getExtendingClass().ifPresent(extending -> {
-            if (extending.getTargetReference() instanceof IClass) {
-                classes.add((IClass) extending.getTargetReference());
-            }
-        });
-        return classes;
-    }
+	default @NotNull StaticClassCaller createStaticCaller() {
+		return new StaticClassCaller(this);
+	}
+
+	@Override
+	default @NotNull SortedSet<IClass> getImports() {
+		SortedSet<IClass> classes = new TreeSet<>();
+		classes.addAll(this.getFields()
+				.parallelStream()
+				.flatMap(f -> f.getReturnType().getType().getClasses().parallelStream())
+				.toList());
+		classes.addAll(this.getFunctions()
+				.parallelStream()
+				.flatMap(f -> f.getImports().parallelStream())
+				.collect(Collectors.toSet()));
+		classes.addAll(this.getImplements()
+				.parallelStream()
+				.filter(g -> g.getTargetReference() instanceof IClass)
+				.map(g -> (IClass) g.getTargetReference())
+				.collect(Collectors.toSet()));
+		this.getExtendingClass().ifPresent(extending -> {
+			if (extending.getTargetReference() instanceof IClass) {
+				classes.add((IClass) extending.getTargetReference());
+			}
+		});
+		return classes;
+	}
 }

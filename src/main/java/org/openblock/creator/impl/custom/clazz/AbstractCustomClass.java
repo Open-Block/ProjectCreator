@@ -19,9 +19,9 @@ public abstract class AbstractCustomClass implements IClass {
     protected final Visibility visibility;
     protected @NotNull List<IGeneric> generics = new ArrayList<>();
     protected @NotNull List<Field> fields = new ArrayList<>();
-    protected @NotNull SortedSet<SpecifiedGenerics> implementations = new TreeSet<>(Comparator.comparing((g) -> ((IClass) g.getTargetReference())));
-    protected @NotNull Set<IClass> nestedClasses = new HashSet<>();
-    protected @NotNull Set<IFunction> functions = new HashSet<>();
+    protected @NotNull List<SpecifiedGenerics> implementations = new LinkedList<>();
+    protected @NotNull List<IClass> nestedClasses = new LinkedList<>();
+    protected @NotNull List<IFunction> functions = new LinkedList<>();
 
     public AbstractCustomClass(CustomClassBuilder builder) {
         this.name = builder.getName();
@@ -32,7 +32,7 @@ public abstract class AbstractCustomClass implements IClass {
                 .getFunctions()
                 .stream()
                 .map(f -> f.build(this))
-                .collect(Collectors.toList()));
+                .toList());
 
         if (this.name == null) {
             throw new IllegalArgumentException("Name cannot be null");
@@ -75,17 +75,17 @@ public abstract class AbstractCustomClass implements IClass {
     }
 
     @Override
-    public @NotNull SortedSet<SpecifiedGenerics> getImplements() {
+    public @NotNull List<SpecifiedGenerics> getImplements() {
         return this.implementations;
     }
 
     @Override
-    public @NotNull Set<IClass> getNestedClasses() {
+    public @NotNull List<IClass> getNestedClasses() {
         return this.nestedClasses;
     }
 
     @Override
-    public @NotNull Set<IFunction> getFunctions() {
+    public @NotNull List<IFunction> getFunctions() {
         return this.functions;
     }
 }

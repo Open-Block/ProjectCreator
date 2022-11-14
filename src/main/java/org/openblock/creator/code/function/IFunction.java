@@ -1,6 +1,7 @@
 package org.openblock.creator.code.function;
 
 import org.jetbrains.annotations.NotNull;
+import org.openblock.creator.code.CodeBuilder;
 import org.openblock.creator.code.Nameable;
 import org.openblock.creator.code.Visibility;
 import org.openblock.creator.code.call.Callable;
@@ -10,11 +11,15 @@ import org.openblock.creator.code.clazz.generic.IGeneric;
 import org.openblock.creator.code.function.caller.FunctionCaller;
 import org.openblock.creator.code.statement.Statement;
 import org.openblock.creator.code.variable.parameter.Parameter;
+import org.openblock.creator.impl.custom.function.CustomFunctionBuilder;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public interface IFunction extends Nameable, Statement, Callable, ClassPart, Comparable<IFunction> {
+
+    @Override
+    @NotNull CustomFunctionBuilder toBuilder();
 
     List<Parameter> getParameters();
 

@@ -28,6 +28,20 @@ public class CustomStandardClass extends AbstractCustomClass {
     }
 
     @Override
+    public @NotNull CustomClassBuilder toBuilder() {
+        return new CustomClassBuilder()
+                .setVisibility(this.getVisibility())
+                .setAbstract(this.isAbstract())
+                .setFinal(this.isFinal())
+                .setType(this.getClassType())
+                .setPackageLocation(this.getPackage())
+                .setExtending(this.getExtendingClass().orElse(null))
+                .addImplementing(this.getImplements())
+                .addFunctions(this.getFunctions().parallelStream().map(function -> function.toBuilder()).toList())
+                .addGenerics(this.getGenerics());
+    }
+
+    @Override
     public @NotNull ClassType getClassType() {
         return ClassType.STANDARD;
     }

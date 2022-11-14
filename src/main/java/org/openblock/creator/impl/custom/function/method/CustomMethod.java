@@ -13,84 +13,98 @@ import java.util.stream.Collectors;
 
 public class CustomMethod extends AbstractCustomFunction implements IMethod {
 
-    private final @NotNull ReturnType returnType;
-    private final boolean isStatic;
+	private final @NotNull ReturnType returnType;
+	private final boolean isStatic;
 
-    public CustomMethod(@NotNull IClass clazz, CustomFunctionBuilder builder) {
-        super(clazz, builder);
-        this.isStatic = builder.isStatic();
-        this.returnType = builder.getReturnType();
-    }
+	public CustomMethod(@NotNull IClass clazz, CustomFunctionBuilder builder) {
+		super(clazz, builder);
+		this.isStatic = builder.isStatic();
+		this.returnType = builder.getReturnType();
+	}
 
-    @Override
-    public @NotNull ReturnType getReturnType() {
-        return this.returnType;
-    }
+	@Override
+	public @NotNull ReturnType getReturnType() {
+		return this.returnType;
+	}
 
-    @Override
-    public String writeCode(int indent, ClassType type) {
-        StringBuilder builder = new StringBuilder();
-        if (type.equals(ClassType.INTERFACE)) {
-            if (!this.getCodeBlock().isEmpty()) {
-                builder
-                        .append(" ".repeat(indent * 4))
-                        .append("default ");
-            } else {
-                builder
-                        .append(" ".repeat(indent * 4));
-            }
-        } else {
-            builder
-                    .append(" ".repeat(indent * 4))
-                    .append(this.getVisibility().getDisplayName())
-                    .append(" ");
-        }
-        if (this.isStatic()) {
-            builder.append("static ");
-        }
-        if (!this.getGenerics().isEmpty()) {
-            String generics = this.getGenerics().stream().map(g -> g.writeCode(0)).collect(Collectors.joining(", "));
-            builder.append("<");
-            builder.append(generics);
-            builder.append("> ");
-        }
-        builder.append(this.getReturnType().getDisplayText());
-        builder.append(" ");
-        builder.append(this.getName());
-        builder.append(" (");
-        builder.append(this
-                .getParameters()
-                .stream()
-                .map(p -> (p.isFinal() ? "final " : "")
-                        + p.getReturnType().getDisplayText()
-                        + " " + p.getName()
-                )
-                .collect(Collectors.joining(", ")));
-        builder.append(")");
-        if (type.equals(ClassType.INTERFACE) && this.getCodeBlock().isEmpty()) {
-            builder.append(";\n");
-        } else {
-            builder.append("{\n");
-        }
-        this.getCodeBlock().forEach(c -> builder.append("\n").append(" ".repeat((indent + 1) * 4)).append(c.writeCode(0)));
-        if (!(type.equals(ClassType.INTERFACE) && this.getCodeBlock().isEmpty())) {
-            builder.append(" ".repeat(indent * 4)).append("}\n");
-        }
-        return builder.toString();
-    }
+	@Override
+	public @NotNull CustomFunctionBuilder toBuilder() {
+		return new CustomFunctionBuilder()
+				.setReturnType(this.returnType)
+				.setName(this.name)
+				.setStatic(this.isStatic)
+				.setVisibility(this.getVisibility())
+				.setClassFor(this.getTargetClass())
+				.addParameters(this.getParameters())
+				.addCodeBlock(this.getCodeBlock())
+				.addGenerics(this.getGenerics());
+	}
 
-    @Override
-    public boolean isStatic() {
-        return this.isStatic;
-    }
+	@Override
+	public String writeCode(int indent, ClassType type) {
+		StringBuilder builder = new StringBuilder();
+		if (type.equals(ClassType.INTERFACE)) {
+			if (!this.getCodeBlock().isEmpty()) {
+				builder
+						.append(" ".repeat(indent * 4))
+						.append("default ");
+			} else {
+				builder
+						.append(" ".repeat(indent * 4));
+			}
+		} else {
+			builder
+					.append(" ".repeat(indent * 4))
+					.append(this.getVisibility().getDisplayName())
+					.append(" ");
+		}
+		if (this.isStatic()) {
+			builder.append("static ");
+		}
+		if (!this.getGenerics().isEmpty()) {
+			String generics = this.getGenerics().stream().map(g -> g.writeCode(0)).collect(Collectors.joining(", "));
+			builder.append("<");
+			builder.append(generics);
+			builder.append("> ");
+		}
+		builder.append(this.getReturnType().getDisplayText());
+		builder.append(" ");
+		builder.append(this.getName());
+		builder.append(" (");
+		builder.append(this
+				.getParameters()
+				.stream()
+				.map(p -> (p.isFinal() ? "final " : "")
+						+ p.getReturnType().getDisplayText()
+						+ " " + p.getName()
+				)
+				.collect(Collectors.joining(", ")));
+		builder.append(")");
+		if (type.equals(ClassType.INTERFACE) && this.getCodeBlock().isEmpty()) {
+			builder.append(";\n");
+		} else {
+			builder.append("{\n");
+		}
+		this.getCodeBlock()
+				.forEach(c -> builder.append("\n").append(" ".repeat((indent + 1) * 4)).append(c.writeCode(0)));
+		if (!(type.equals(ClassType.INTERFACE) && this.getCodeBlock().isEmpty())) {
+			builder.append(" ".repeat(indent * 4)).append("}\n");
+		}
+		return builder.toString();
+	}
 
-    @Override
-    public boolean isAbstract() {
-        throw new RuntimeException("Not Implemented Yet");
-    }
+	@Override
+	public boolean isStatic() {
+		return this.isStatic;
+	}
 
-    @Override
-    public @NotNull SortedSet<IClass> getImports() {
-        throw new RuntimeException("Not Implemented Yet");
-    }
+	@Override
+	public boolean isAbstract() {
+		throw new RuntimeException("Not Implemented Yet");
+	}
+
+	@Override
+	public @NotNull SortedSet<IClass> getImports() {
+		throw new RuntimeException("Not Implemented Yet");
+	}
 }

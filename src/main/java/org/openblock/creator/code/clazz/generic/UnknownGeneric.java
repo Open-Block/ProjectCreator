@@ -1,6 +1,7 @@
 package org.openblock.creator.code.clazz.generic;
 
 import org.jetbrains.annotations.NotNull;
+import org.openblock.creator.code.CodeBuilder;
 import org.openblock.creator.code.Nameable;
 import org.openblock.creator.code.clazz.IClass;
 import org.openblock.creator.code.clazz.type.IType;
@@ -13,6 +14,11 @@ public class UnknownGeneric implements IGeneric {
     private final List<IType> types = new ArrayList<>();
     private final boolean extended;
 
+    public UnknownGeneric(SimpleGenericBuilder builder){
+        this.types.addAll(builder.getTypes());
+        this.extended = builder.isExtending();
+    }
+
     public UnknownGeneric(boolean extended, Collection<IType> type) {
         this.types.addAll(type);
         this.extended = extended;
@@ -21,6 +27,11 @@ public class UnknownGeneric implements IGeneric {
     @Override
     public @NotNull SortedSet<IClass> getImports() {
         return this.types.stream().flatMap(c -> c.getClasses().stream()).collect(Collectors.toCollection(TreeSet::new));
+    }
+
+    @Override
+    public @NotNull CodeBuilder<?> toBuilder() {
+        return new SimpleGenericBuilder().setExtending(this.extended).addTypes(this.types);
     }
 
     @Override

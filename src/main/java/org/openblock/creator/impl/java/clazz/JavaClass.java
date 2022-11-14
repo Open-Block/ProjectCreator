@@ -1,6 +1,7 @@
 package org.openblock.creator.impl.java.clazz;
 
 import org.jetbrains.annotations.NotNull;
+import org.openblock.creator.code.CodeBuilder;
 import org.openblock.creator.code.Visibility;
 import org.openblock.creator.code.call.returntype.StatedReturnType;
 import org.openblock.creator.code.clazz.ClassType;
@@ -12,6 +13,7 @@ import org.openblock.creator.code.clazz.type.SpecifiedGenericType;
 import org.openblock.creator.code.function.IFunction;
 import org.openblock.creator.code.variable.field.Field;
 import org.openblock.creator.code.variable.field.UninitiatedField;
+import org.openblock.creator.impl.custom.clazz.CustomClassBuilder;
 import org.openblock.creator.impl.java.clazz.generic.JavaGenerics;
 import org.openblock.creator.impl.java.clazz.generic.specified.JavaClassGenerics;
 import org.openblock.creator.impl.java.clazz.writer.JavaClassWriter;
@@ -166,6 +168,20 @@ public class JavaClass implements IClass {
     @Deprecated
     public @NotNull String writeCode(int indent) {
         return writeCode();
+    }
+
+    @Override
+    public @NotNull CustomClassBuilder toBuilder() {
+        return new CustomClassBuilder()
+                .setExtending(this.getExtendingClass().orElse(null))
+                .setName(this.getName())
+                .setPackageLocation(this.getPackage())
+                .setType(this.getClassType())
+                .setFinal(this.isFinal())
+                .setAbstract(this.isAbstract())
+                .setVisibility(this.getVisibility())
+                .addImplementing(this.getImplements())
+                .addFunctions(this.getFunctions().parallelStream().map(IFunction::toBuilder).toList());
     }
 
     @Override

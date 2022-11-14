@@ -1,8 +1,10 @@
 package org.openblock.creator.code.variable;
 
 import org.jetbrains.annotations.NotNull;
+import org.openblock.creator.code.CodeBuilder;
 import org.openblock.creator.code.call.Caller;
 import org.openblock.creator.code.clazz.IClass;
+import org.openblock.creator.code.clazz.caller.CallerBuilder;
 import org.openblock.creator.utils.OpenStringUtils;
 
 import java.util.SortedSet;
@@ -24,6 +26,11 @@ public class VariableCaller<V extends IVariable> implements Caller {
     @Override
     public @NotNull SortedSet<IClass> getImports() {
         return new TreeSet<>();
+    }
+
+    @Override
+    public @NotNull CallerBuilder toBuilder() {
+        return new CallerBuilder().setCaller(this.parameter);
     }
 
     @Override

@@ -7,65 +7,73 @@ import org.openblock.creator.code.clazz.type.BasicType;
 import org.openblock.creator.code.clazz.type.IType;
 import org.openblock.creator.code.variable.IVariable;
 
+import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 public abstract class Field implements IVariable {
 
-    protected String name;
-    protected boolean isFinal;
-    protected boolean isStatic;
-    protected Visibility visibility;
+	protected @NotNull String name;
+	protected boolean isFinal;
+	protected boolean isStatic;
+	protected @NotNull Visibility visibility;
 
-    public Field(Visibility visibility, String name, boolean isFinal, boolean isStatic) {
-        this.name = name;
-        this.isFinal = isFinal;
-        this.isStatic = isStatic;
-        this.visibility = visibility;
-    }
+	public Field(@NotNull Visibility visibility, @NotNull String name, boolean isFinal, boolean isStatic) {
+		this.name = name;
+		this.isFinal = isFinal;
+		this.isStatic = isStatic;
+		this.visibility = visibility;
+	}
 
-    public Visibility getVisibility(){
-        return this.visibility;
-    }
+	public Field(@NotNull FieldBuilder builder) {
+		this.name = Objects.requireNonNull(builder.getName());
+		this.isFinal = builder.isFinal();
+		this.isStatic = builder.isStatic();
+		this.visibility = Objects.requireNonNull(builder.getVisibility());
+	}
 
-    public boolean isStatic(){
-        return this.isStatic;
-    }
+	@Override
+	public abstract @NotNull FieldBuilder toBuilder();
 
-    @Override
-    public @NotNull String writeCode(int indent) {
-        String ret = " ".repeat(indent * 4) + this.getVisibility().getDisplayName() + " ";
-        if(this.isStatic()){
-            ret = ret + "static ";
-        }
-        if(this.isFinal()){
-            ret = ret + "final ";
-        }
-        ret = ret + this.getReturnType().getDisplayText() + " ";
-        ret = ret + this.getName();
-        return ret;
-    }
+	public @NotNull Visibility getVisibility() {
+		return this.visibility;
+	}
 
-    @Override
-    public @NotNull SortedSet<IClass> getImports() {
-        SortedSet<IClass> classes = new TreeSet<>();
-        IType type = this.getReturnType().getType();
-        if(type instanceof BasicType b){
-            classes.add(b.getTargetClass());
-        }
-        if(this instanceof InitiatedField f){
-            classes.addAll(f.getCode().getImports());
-        }
-        return classes;
-    }
+	public boolean isStatic() {
+		return this.isStatic;
+	}
 
-    @Override
-    public @NotNull String getName() {
-        return this.name;
-    }
+	@Override
+	public @NotNull String writeCode(int indent) {
+		String ret = " ".repeat(indent * 4) + this.getVisibility().getDisplayName() + " ";
+		if (this.isStatic()) {
+			ret = ret + "static ";
+		}
+		if (this.isFinal()) {
+			ret = ret + "final ";
+		}
+		ret = ret + this.getReturnType().getDisplayText() + " ";
+		ret = ret + this.getName();
+		return ret;
+	}
 
-    @Override
-    public boolean isFinal() {
-        return this.isFinal;
-    }
+	@Override
+	public @NotNull SortedSet<IClass> getImports() {
+		SortedSet<IClass> classes = new TreeSet<>();
+		IType type = this.getReturnType().getType();
+		if (type instanceof BasicType b) {
+			classes.add(b.getTargetClass());
+		}
+		return classes;
+	}
+
+	@Override
+	public @NotNull String getName() {
+		return this.name;
+	}
+
+	@Override
+	public boolean isFinal() {
+		return this.isFinal;
+	}
 }

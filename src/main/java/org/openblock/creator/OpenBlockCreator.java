@@ -7,10 +7,11 @@ import java.util.regex.Pattern;
 
 public class OpenBlockCreator {
 
-    public static JavaClass getJavaClass(@NotNull String clazz) throws ClassNotFoundException {
-        if (!(clazz.contains(Pattern.quote(".")) || clazz.contains("."))) {
-            return new JavaClass(Class.forName("java.lang." + clazz));
-        }
-        return new JavaClass(Class.forName(clazz));
-    }
+	public static JavaClass getJavaClass(@NotNull String clazz) throws ClassNotFoundException {
+		clazz = clazz.trim();
+		if (!(clazz.contains(Pattern.quote(".")) || clazz.contains("."))) {
+			return new JavaClass(Class.forName("java.lang." + clazz));
+		}
+		return new JavaClass(Class.forName(clazz));
+	}
 }
