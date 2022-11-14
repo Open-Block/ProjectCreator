@@ -1123,7 +1123,7 @@ public class CustomClassReader {
 			int a = 0;
 			for (; a < commands.length; a++) {
 				String command = commands[a];
-				if (command.equals(" extends ")) {
+				if (command.equals("extends")) {
 					break;
 				}
 			}
