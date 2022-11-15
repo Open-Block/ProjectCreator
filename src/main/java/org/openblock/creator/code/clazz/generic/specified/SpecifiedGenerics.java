@@ -17,7 +17,11 @@ public interface SpecifiedGenerics {
     @NotNull Nameable getTargetReference();
 
     default boolean hasInheritance(IClass clazz) {
-        return this.getGenerics().parallelStream().anyMatch(gen -> gen.hasInheritance(clazz));
+        Nameable nameable = this.getTargetReference();
+        if(nameable instanceof IClass thisClass){
+            return thisClass.hasInheritance(clazz);
+        }
+        return false;
     }
 
     default @NotNull String getDisplayName() {

@@ -14,12 +14,16 @@ import org.openblock.creator.code.function.IFunction;
 import org.openblock.creator.code.variable.field.Field;
 import org.openblock.creator.code.variable.field.UninitiatedField;
 import org.openblock.creator.impl.custom.clazz.CustomClassBuilder;
+import org.openblock.creator.impl.custom.function.CustomFunctionBuilder;
+import org.openblock.creator.impl.custom.function.constructor.CustomConstructor;
 import org.openblock.creator.impl.java.clazz.generic.JavaGenerics;
 import org.openblock.creator.impl.java.clazz.generic.specified.JavaClassGenerics;
 import org.openblock.creator.impl.java.clazz.writer.JavaClassWriter;
 import org.openblock.creator.impl.java.function.constructor.JavaConstructor;
 import org.openblock.creator.impl.java.function.method.JavaMethod;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -153,11 +157,26 @@ public class JavaClass implements IClass {
         return Stream.of(this.clazz.getClasses()).parallel().map(JavaClass::new).collect(Collectors.toSet());
     }
 
+    private Set<IFunction> getFunctions(Method[] methods){
+        Set<IFunction> functions = Stream.of(methods).map(JavaMethod::new).collect(Collectors.toSet());
+        Constructor<?>[] constructors = this.clazz.getConstructors();
+        functions.addAll(Stream.of(constructors).map(c -> new JavaConstructor(c)).collect(Collectors.toSet()));
+        if (constructors.length == 0) {
+            CustomConstructor constructor = new CustomConstructor(this, new CustomFunctionBuilder().setClassFor(this).setVisibility(Visibility.PUBLIC));
+            functions.add(constructor);
+        }
+        return functions;
+    }
+
     @Override
     public Set<IFunction> getFunctions() {
-        Set<IFunction> functions = Stream.of(this.clazz.getMethods()).map(JavaMethod::new).collect(Collectors.toSet());
-        functions.addAll(Stream.of(this.clazz.getConstructors()).map(c -> new JavaConstructor(c)).collect(Collectors.toSet()));
-        return functions;
+        try {
+            return getFunctions(this.clazz.getMethods());
+        }catch (Throwable e){
+            System.err.println("Failed on getting all functions in " + this.getFullName() + ": " + e.getMessage());
+            System.err.println("\tAttempting to get just declared methods");
+            return getFunctions(this.clazz.getDeclaredMethods());
+        }
     }
 
     public String writeCode() {

@@ -1,6 +1,7 @@
 package org.openblock.creator.code.clazz.type;
 
 import org.jetbrains.annotations.NotNull;
+import org.openblock.creator.code.Nameable;
 import org.openblock.creator.code.clazz.IClass;
 import org.openblock.creator.code.clazz.generic.IGeneric;
 import org.openblock.creator.code.clazz.generic.specified.SpecifiedGenerics;
@@ -28,15 +29,10 @@ public class SpecifiedGenericType implements IType {
 
     @Override
     public List<IClass> getClasses() {
-        List<IGeneric> generics = this.generics.getGenerics();
-        if (generics.isEmpty() && this.generics.getTargetReference() instanceof IClass clazz) {
+        Nameable nameable = this.generics.getTargetReference();
+        if(nameable instanceof IClass clazz){
             return Collections.singletonList(clazz);
         }
-
-        return generics
-                .parallelStream()
-                .flatMap(s -> s.getClasses().parallelStream())
-                .flatMap(t -> t.getClasses().parallelStream())
-                .collect(Collectors.toList());
+        throw new RuntimeException("Unknown nameable class of " + nameable.getClass().getName());
     }
 }

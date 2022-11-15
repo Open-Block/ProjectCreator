@@ -16,6 +16,7 @@ import org.openblock.creator.code.function.IMethod;
 import org.openblock.creator.code.variable.field.Field;
 import org.openblock.creator.impl.custom.clazz.CustomClassBuilder;
 import org.openblock.creator.impl.custom.function.method.CustomMethod;
+import org.openblock.creator.impl.java.clazz.JavaClass;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -63,9 +64,9 @@ public interface IClass extends Nameable, Codeable, CallerProvider, Abstractable
 				.filter(Field::isStatic)
 				.map(Callable::createCaller)
 				.collect(Collectors.toSet()));
-		callers.addAll(this.getFunctions(CustomMethod.class)
+		callers.addAll(this.getFunctions(IMethod.class)
 				.stream()
-				.filter(CustomMethod::isStatic)
+				.filter(IMethod::isStatic)
 				.map(Callable::createCaller)
 				.collect(Collectors.toSet()));
 		return callers;
@@ -85,6 +86,9 @@ public interface IClass extends Nameable, Codeable, CallerProvider, Abstractable
 
 	default boolean hasInheritance(IClass clazz) {
 		if (clazz.equals(this)) {
+			return true;
+		}
+		if(clazz instanceof JavaClass jClass && jClass.getTargetClass().equals(Object.class)){
 			return true;
 		}
 		boolean iImpl = this.getImplements().parallelStream().anyMatch(iface -> iface.hasInheritance(clazz));
